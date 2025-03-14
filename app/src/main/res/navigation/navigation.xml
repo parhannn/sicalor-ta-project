@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_home"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.sicalor.fragment.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_food"
+            app:destination="@id/navigation_food" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_schedule"
+            app:destination="@id/navigation_schedule" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_navigation_home_to_cameraActivity"
+            app:destination="@id/cameraActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_food"
+        android:name="com.example.sicalor.fragment.FoodFragment"
+        android:label="fragment_food"
+        tools:layout="@layout/fragment_food" />
+    <fragment
+        android:id="@+id/navigation_schedule"
+        android:name="com.example.sicalor.fragment.ScheduleFragment"
+        android:label="fragment_schedule"
+        tools:layout="@layout/fragment_schedule" />
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.sicalor.fragment.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <activity
+        android:id="@+id/cameraActivity"
+        android:name="com.example.sicalor.scan.CameraActivity"
+        android:label="activity_camera"
+        tools:layout="@layout/activity_camera" />
+</navigation>

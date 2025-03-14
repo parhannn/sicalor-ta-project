@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SiCalor" parent="Theme.MaterialComponents.DayNight">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimarySoft</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="statusBarBackground">@color/white</item>
+    </style>
+
+    <style name="BackgroundNightDay">
+        <item name="android:background">@color/black</item>
+    </style>
+
+    <style name="Theme.SiCalor" parent="Base.Theme.SiCalor" />
+</resources>
