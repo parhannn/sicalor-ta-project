@@ -32,6 +32,7 @@
             android:background="@drawable/transparent"
             app:itemIconSize="30dp"
             app:itemIconTint="@color/nav_icon_color"
+            app:itemRippleColor="@color/colorPrimarySoft"
             app:itemTextAppearanceActiveBoldEnabled="false"
             app:labelVisibilityMode="unlabeled"
             app:menu="@menu/bottom_menu" />
