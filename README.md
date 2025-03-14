@@ -22,3 +22,11 @@ Penelitian ini bertujuan untuk mengembangkan sistem berbasis Android yang dapat 
 Penelitian kami dipecah menjadi dua lingkup utama:
 1. 📖 Judul Tugas Akhir Anggota 1: *PENGENALAN CITRA MAKANAN BERBASIS DEEP LEARNING MENGGUNAKAN ALGORITMA CONVOLUTIONAL NEURAL NETWORK (CNN) DENGAN ARSITEKTUR YOLOv11*
 2. 📖 Judul Tugas Akhit Anggota 2: *PENGEMBANGAN SISTEM PENJADWALAN MENU MAKANAN BERBASIS ANDROID MENGGUNAKAN METODE PERSONAL EXTREME PROGRAMMING*
+
+---
+
+<div align="center">
+
+Institut Teknologi Sumatera
+
+</div>
