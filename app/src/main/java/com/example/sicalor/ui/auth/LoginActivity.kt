@@ -72,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     showLoading(false)
-                    Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Login failed, your credential is incorrect!", Toast.LENGTH_SHORT).show()
                 }
             }
     }

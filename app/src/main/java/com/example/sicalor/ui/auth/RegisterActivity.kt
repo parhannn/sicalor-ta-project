@@ -66,6 +66,9 @@ class RegisterActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
+                } else if (password != confirmPassword) {
+                    showLoading(false)
+                    Toast.makeText(this, "Password doesn't match", Toast.LENGTH_SHORT).show()
                 } else {
                     showLoading(false)
                     Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
