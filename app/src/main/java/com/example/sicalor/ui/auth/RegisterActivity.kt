@@ -42,38 +42,52 @@ class RegisterActivity : AppCompatActivity() {
         password: String,
         confirmPassword: String
     ) {
-        showLoading(true)
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                showLoading(false)
-                if (task.isSuccessful && password == confirmPassword) {
-                    val user = auth.currentUser
-                    user?.sendEmailVerification()
-                        ?.addOnCompleteListener { verificationTask ->
-                            if (verificationTask.isSuccessful) {
-                                Toast.makeText(
-                                    this,
-                                    "Verification email sent to $email. Please verify your email so you can login again.",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
-                                finish()
-                            } else {
-                                Toast.makeText(
-                                    this,
-                                    "Failed to send verification email",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            return
+        } else {
+            showLoading(true)
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    showLoading(false)
+                    if (task.isSuccessful && password == confirmPassword) {
+                        val user = auth.currentUser
+                        user?.sendEmailVerification()
+                            ?.addOnCompleteListener { verificationTask ->
+                                if (verificationTask.isSuccessful) {
+                                    Toast.makeText(
+                                        this,
+                                        "Verification email sent to $email. Please verify your email so you can login again.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    startActivity(
+                                        Intent(
+                                            this@RegisterActivity,
+                                            LoginActivity::class.java
+                                        )
+                                    )
+                                    finish()
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        "Failed to send verification email",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
-                        }
-                } else if (password != confirmPassword) {
-                    showLoading(false)
-                    Toast.makeText(this, "Password doesn't match", Toast.LENGTH_SHORT).show()
-                } else {
-                    showLoading(false)
-                    Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    } else if (password != confirmPassword) {
+                        showLoading(false)
+                        Toast.makeText(this, "Password doesn't match", Toast.LENGTH_SHORT).show()
+                    } else {
+                        showLoading(false)
+                        Toast.makeText(
+                            this,
+                            "Registration failed: ${task.exception?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {

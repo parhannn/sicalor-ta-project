@@ -57,24 +57,37 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
-        showLoading(true)
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    showLoading(false)
-                    val user = auth.currentUser
-                    if (user != null && user.isEmailVerified) {
-                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            return
+        } else {
+            showLoading(true)
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        showLoading(false)
+                        val user = auth.currentUser
+                        if (user != null && user.isEmailVerified) {
+                            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this,
+                                "Please verify your email first",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
-                        Toast.makeText(this, "Please verify your email first.", Toast.LENGTH_SHORT).show()
+                        showLoading(false)
+                        Toast.makeText(
+                            this,
+                            "Login failed, your credential is incorrect!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                } else {
-                    showLoading(false)
-                    Toast.makeText(this, "Login failed, your credential is incorrect!", Toast.LENGTH_SHORT).show()
                 }
-            }
+        }
     }
 
     private fun signInWithGoogle() {
