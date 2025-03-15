@@ -1,16 +1,14 @@
-package com.example.sicalor.landing
+package com.example.sicalor.ui.landing
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.WindowInsetsCompat
-import com.example.sicalor.MainActivity
+import com.example.sicalor.ui.MainActivity
 import com.example.sicalor.R
+import com.example.sicalor.ui.auth.LoginActivity
 import com.example.sicalor.utils.InitApp
 
 @Suppress("DEPRECATION")
@@ -34,7 +32,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun goToMainActivity() {
-        Intent(this, MainActivity::class.java).also {
+        Intent(this, LoginActivity::class.java).also {
             startActivity(it)
             finish()
         }

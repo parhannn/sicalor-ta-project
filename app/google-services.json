@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "641382458719",
+    "project_id": "sicalor-89bae",
+    "storage_bucket": "sicalor-89bae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641382458719:android:b61df63835afa833bec2ea",
+        "android_client_info": {
+          "package_name": "com.example.sicalor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641382458719-7posic356j5o80jp8f43b7ogp3913ht7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sicalor",
+            "certificate_hash": "dd3d6bbadf209838496b2511d1b2ab9173711b2c"
+          }
+        },
+        {
+          "client_id": "641382458719-pla16438ghq5mdn4s7v4blarga37vf1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfwEO9xMPleNRRo_HKP2n5lfUwxIQOZ8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641382458719-pla16438ghq5mdn4s7v4blarga37vf1p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

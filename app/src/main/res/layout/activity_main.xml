@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <fragment
         android:id="@+id/navhost"
@@ -35,7 +35,9 @@
             app:itemRippleColor="@color/colorPrimarySoft"
             app:itemTextAppearanceActiveBoldEnabled="false"
             app:labelVisibilityMode="unlabeled"
-            app:menu="@menu/bottom_menu" />
+            app:menu="@menu/bottom_menu">
+
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,4 +47,15 @@
         app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@id/nav"
         app:srcCompat="@drawable/ic_scan_white" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="72dp"
+        app:backgroundTint="@color/colorError"
+        app:layout_anchor="@id/nav"
+        app:layout_anchorGravity="end"
+        app:srcCompat="@drawable/ic_logout" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

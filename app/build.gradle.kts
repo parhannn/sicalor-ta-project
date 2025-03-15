@@ -2,11 +2,12 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.google.services)
 }
 
 android {
     namespace = "com.example.sicalor"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.sicalor"
@@ -64,6 +65,10 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.runtime.android)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     annotationProcessor(libs.compiler)
 
     //scan

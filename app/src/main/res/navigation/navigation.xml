@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.sicalor.fragment.HomeFragment"
+        android:name="com.example.sicalor.ui.fragment.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -25,22 +25,22 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_food"
-        android:name="com.example.sicalor.fragment.FoodFragment"
+        android:name="com.example.sicalor.ui.fragment.FoodFragment"
         android:label="fragment_food"
         tools:layout="@layout/fragment_food" />
     <fragment
         android:id="@+id/navigation_schedule"
-        android:name="com.example.sicalor.fragment.ScheduleFragment"
+        android:name="com.example.sicalor.ui.fragment.ScheduleFragment"
         android:label="fragment_schedule"
         tools:layout="@layout/fragment_schedule" />
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.example.sicalor.fragment.ProfileFragment"
+        android:name="com.example.sicalor.ui.fragment.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <activity
         android:id="@+id/cameraActivity"
-        android:name="com.example.sicalor.scan.CameraActivity"
+        android:name="com.example.sicalor.ui.scan.CameraActivity"
         android:label="activity_camera"
         tools:layout="@layout/activity_camera" />
 </navigation>

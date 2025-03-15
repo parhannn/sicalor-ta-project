@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.sicalor" />
+                  <option name="mobileSdkAppId" value="1:641382458719:android:b61df63835afa833bec2ea" />
+                  <option name="projectId" value="sicalor-89bae" />
+                  <option name="projectNumber" value="641382458719" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

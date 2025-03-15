@@ -1,4 +1,4 @@
-package com.example.sicalor.scan
+package com.example.sicalor.ui.scan
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
