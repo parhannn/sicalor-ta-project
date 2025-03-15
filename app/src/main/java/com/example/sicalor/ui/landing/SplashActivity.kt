@@ -6,9 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.sicalor.ui.MainActivity
 import com.example.sicalor.R
-import com.example.sicalor.ui.auth.LoginActivity
 import com.example.sicalor.utils.InitApp
 
 @Suppress("DEPRECATION")
@@ -32,7 +30,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun goToMainActivity() {
-        Intent(this, LoginActivity::class.java).also {
+        Intent(this, OnboardingActivity::class.java).also {
             startActivity(it)
             finish()
         }
