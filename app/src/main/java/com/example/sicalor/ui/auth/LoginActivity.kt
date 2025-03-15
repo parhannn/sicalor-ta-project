@@ -111,9 +111,17 @@ class LoginActivity : AppCompatActivity() {
                     context = this@LoginActivity
                 )
                 handleSignIn(result)
-            } catch (e: GetCredentialException) {
+            } catch (exception: GetCredentialException) {
                 showLoading(false)
-                Log.d("Error", e.message.toString())
+                Log.d("Error", exception.message.toString())
+
+                val errorMessage = exception.toString()
+
+                if (errorMessage.contains("No credentials available", ignoreCase = true)) {
+                    Toast.makeText(this@LoginActivity, "You don't have any connected Google account yet", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this@LoginActivity, "Authentication Canceled", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -142,11 +150,11 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithCredential:success")
+                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                     val user: FirebaseUser? = auth.currentUser
                     updateUI(user)
                 } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Toast.makeText(this, "You don't have a connected Google account yet", Toast.LENGTH_LONG).show()
                     updateUI(null)
                 }
             }
