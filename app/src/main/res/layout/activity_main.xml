@@ -46,7 +46,8 @@
         android:layout_height="wrap_content"
         app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@id/nav"
-        app:srcCompat="@drawable/ic_scan_white" />
+        app:srcCompat="@drawable/ic_scan"
+        app:tint="@color/colorPrimarySoft" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/logout_button"
@@ -57,5 +58,6 @@
         app:backgroundTint="@color/colorError"
         app:layout_anchor="@id/nav"
         app:layout_anchorGravity="end"
-        app:srcCompat="@drawable/ic_logout" />
+        app:srcCompat="@drawable/ic_logout"
+        app:tint="@color/colorOnPrimary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
