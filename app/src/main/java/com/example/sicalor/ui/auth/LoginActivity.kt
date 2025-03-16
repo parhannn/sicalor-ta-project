@@ -122,8 +122,10 @@ class LoginActivity : AppCompatActivity() {
 
                 if (errorMessage.contains("No credentials available", ignoreCase = true)) {
                     Toast.makeText(this@LoginActivity, "You don't have any connected Google account yet", Toast.LENGTH_LONG).show()
-                } else {
+                } else if(errorMessage.contains("activity is cancelled by the user", ignoreCase = true)) {
                     Toast.makeText(this@LoginActivity, "Authentication Canceled", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this@LoginActivity, "Authentication Failed", Toast.LENGTH_LONG).show()
                 }
             }
         }
