@@ -15,7 +15,6 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Custom Indicator -->
     <LinearLayout
         android:id="@+id/indicatorLayout"
         android:layout_width="match_parent"
@@ -25,31 +24,26 @@
         android:paddingTop="16dp"
         android:paddingBottom="16dp">
 
-        <!-- Indikator untuk tiga halaman -->
-        <!-- Indikator pertama (aktif) -->
-        <View
+        <ImageView
             android:id="@+id/indicator1"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_margin="4dp"
             android:background="@drawable/indicator_active" />
 
-        <!-- Indikator kedua (tidak aktif) -->
-        <View
+        <ImageView
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_margin="4dp"
             android:background="@drawable/indicator_inactive" />
 
-        <!-- Indikator ketiga (tidak aktif) -->
-        <View
+        <ImageView
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_margin="4dp"
             android:background="@drawable/indicator_inactive" />
     </LinearLayout>
 
-    <!-- Tombol Navigasi dengan Desain Lebih Menarik -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="Already registered?"
+            android:fontFamily="@font/poppins_light"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary" />
 
@@ -94,6 +89,7 @@
             android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_medium"
             android:text="Login"
             android:textColor="@color/colorAccent" />
     </LinearLayout>

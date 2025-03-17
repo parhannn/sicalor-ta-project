@@ -29,7 +29,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".ui.landing.SplashActivity"
             android:exported="true">

@@ -1,11 +1,16 @@
 package com.example.sicalor.ui
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.lifecycle.lifecycleScope
@@ -28,9 +33,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomNavView: BottomNavigationView
     private lateinit var auth: FirebaseAuth
+    private val cameraPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                Toast.makeText(this, "Camera permission granted.", Toast.LENGTH_SHORT).show()
+                checkGalleryPermission()
+            } else {
+                Toast.makeText(this, "Camera permission denied!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    private val galleryPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                Toast.makeText(this, "Gallery permission granted.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Gallery permission denied!", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        checkCameraPermission()
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -96,6 +120,36 @@ class MainActivity : AppCompatActivity() {
             credentialManager.clearCredentialState(ClearCredentialStateRequest())
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
             finish()
+        }
+    }
+
+    private fun checkCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+
+            }
+
+            else -> {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+
+    private fun checkGalleryPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
+
+            }
+
+            else -> {
+                galleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
     }
 }
