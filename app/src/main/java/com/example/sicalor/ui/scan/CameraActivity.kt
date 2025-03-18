@@ -29,15 +29,6 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var imageCapture: ImageCapture? = null
-    private val galleryPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                startGallery()
-            } else {
-                Toast.makeText(this, "Storage permission required!", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
     private val launcherGallery = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -99,28 +90,13 @@ class CameraActivity : AppCompatActivity() {
             startCamera()
         }
         binding.captureImage.setOnClickListener { captureImage() }
-        binding.openGallery.setOnClickListener { checkGalleryPermission() }
+        binding.openGallery.setOnClickListener { startGallery() }
         binding.backButton.setOnClickListener { finish() }
     }
 
     override fun onStart() {
         super.onStart()
         orientationEventListener.enable()
-    }
-
-    private fun checkGalleryPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                startGallery()
-            }
-
-            else -> {
-                galleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        }
     }
 
     private fun startGallery() {
