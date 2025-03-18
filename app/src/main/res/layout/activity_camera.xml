@@ -7,4 +7,71 @@
     android:layout_height="match_parent"
     tools:context=".ui.scan.CameraActivity">
 
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:theme="@style/Theme.AppCompat.Light"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_white"
+        app:tint="@color/colorPrimary" />
+
+    <ImageView
+        android:id="@+id/face_silhouette"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:paddingBottom="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/capture_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/viewFinder"
+        app:srcCompat="@drawable/scan_silhouette" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/capture_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:scaleType="center"
+        app:backgroundTint="@color/colorPrimary"
+        app:fabCustomSize="80dp"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:maxImageSize="48dp"
+        app:srcCompat="@drawable/ic_capture_big"
+        app:tint="@color/colorPrimarySoft"
+        app:useCompatPadding="true" />
+
+    <ImageView
+        android:id="@+id/open_gallery"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/capture_image"
+        app:layout_constraintEnd_toStartOf="@+id/capture_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/capture_image"
+        app:srcCompat="@drawable/ic_gallery"
+        app:tint="@color/colorPrimary" />
+
+    <ImageView
+        android:id="@+id/switch_camera"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="@+id/capture_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/capture_image"
+        app:layout_constraintTop_toTopOf="@+id/capture_image"
+        app:srcCompat="@drawable/ic_switch_camera"
+        app:tint="@color/colorPrimary" />
 </androidx.constraintlayout.widget.ConstraintLayout>
