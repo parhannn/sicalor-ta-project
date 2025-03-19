@@ -155,9 +155,9 @@
                 android:id="@+id/login_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_bold"
                 android:text="Login"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/colorPrimarySoft" />
         </LinearLayout>
 
         <ProgressBar

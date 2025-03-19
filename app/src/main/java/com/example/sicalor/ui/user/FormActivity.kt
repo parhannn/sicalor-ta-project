@@ -36,29 +36,53 @@ class FormActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        val name = binding.etName.text.toString()
+        val name = binding.etName.text.toString().trim()
         val gender = if (binding.rbMale.isChecked) "Male" else "Female"
-        val age = binding.etAge.text.toString()
-        val weight = binding.etWeight.text.toString()
-        val height = binding.etHeight.text.toString()
-        val allergy = binding.etAllergy.text.toString()
-        val activity = binding.etActivity.text.toString()
-        val bmr = calculateBMR(gender, weight.toDouble(), height.toDouble(), age.toInt()).toString()
+        val age = binding.etAge.text.toString().trim()
+        val weight = binding.etWeight.text.toString().trim()
+        val height = binding.etHeight.text.toString().trim()
+        val allergy = binding.etAllergy.text.toString().trim()
+        val activity = binding.etActivity.text.toString().trim()
+        var isValid = true
 
-        if (name.isNotEmpty() && gender.isNotEmpty() && age.isNotEmpty() && weight.isNotEmpty() && height.isNotEmpty() && allergy.isNotEmpty() && activity.isNotEmpty() && bmr.isNotEmpty()) {
-            saveData(
-                name,
-                gender,
-                age,
-                weight,
-                height,
-                allergy,
-                activity,
-                bmr
-            )
-        } else {
-            Toast.makeText(this@FormActivity, "Please Insert All Fields!", Toast.LENGTH_SHORT)
-                .show()
+        if (name.isEmpty()) {
+            binding.etName.error = "Name cannot be empty"
+            isValid = false
+        }
+
+        if (gender.isEmpty()) {
+            Toast.makeText(this, "Please select gender", Toast.LENGTH_SHORT).show()
+            isValid = false
+        }
+
+        if (age.isEmpty() || !age.matches(Regex("\\d+"))) {
+            binding.etAge.error = "Enter a valid age"
+            isValid = false
+        }
+
+        if (weight.isEmpty() || !weight.matches(Regex("\\d+(\\.\\d+)?"))) {
+            binding.etWeight.error = "Enter a valid weight"
+            isValid = false
+        }
+
+        if (height.isEmpty() || !height.matches(Regex("\\d+(\\.\\d+)?"))) {
+            binding.etHeight.error = "Enter a valid height"
+            isValid = false
+        }
+
+        if (allergy.isEmpty()) {
+            binding.etAllergy.error = "This field cannot be empty"
+            isValid = false
+        }
+
+        if (activity.isEmpty()) {
+            binding.etActivity.error = "This field cannot be empty"
+            isValid = false
+        }
+
+        if (isValid) {
+            val bmr = calculateBMR(gender, weight.toDouble(), height.toDouble(), age.toInt()).toString()
+            saveData(name, gender, age, weight, height, allergy, activity, bmr)
         }
     }
 

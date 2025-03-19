@@ -7,6 +7,7 @@
         <item name="android:statusBarColor">@color/colorPrimary</item>
         <item name="android:windowBackground">@color/white</item>
         <item name="statusBarBackground">@color/white</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
     </style>
 
     <style name="BackgroundNightDay">
