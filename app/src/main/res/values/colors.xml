@@ -23,6 +23,7 @@
     <color name="colorOnSecondary">#FFFFFF</color> <!-- White (for text on secondary) -->
     <color name="colorOnBackground">#000000</color> <!-- Black (for text on background) -->
     <color name="colorOnDark">#1F1F1F</color>
+    <color name="colorOnDarkDefault">#1D1D1D</color>
 
     <!-- Error and Warning Colors -->
     <color name="colorError">#B00020</color> <!-- Red (for errors) -->

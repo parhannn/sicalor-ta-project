@@ -58,12 +58,12 @@ class ProfileFragment : Fragment() {
                     val userData = userSnapshot.getValue(UserData::class.java)
 
                     if (userData != null) {
-                        binding.tvName.text = userData.name
-                        binding.tvGender.text = userData.gender
-                        binding.tvAge.text = userData.age
-                        binding.tvWeight.text = userData.weight
-                        binding.tvHeight.text = userData.height
-                        binding.tvActivity.text = userData.activity
+                        binding.tvName.text = if (userData.name.isNotEmpty()) userData.name else "Data Empty"
+                        binding.tvGender.text = if (userData.gender.isNotEmpty()) userData.gender else "Data Empty"
+                        binding.tvAge.text = if (userData.age.isNotEmpty()) "${userData.age} year" else "Data Empty"
+                        binding.tvWeight.text = if (userData.weight.isNotEmpty()) "${userData.weight} kg" else "Data Empty"
+                        binding.tvHeight.text = if (userData.height.isNotEmpty()) "${userData.height} cm" else "Data Empty"
+                        binding.tvActivity.text = if (userData.activity.isNotEmpty()) userData.activity else "Data Empty"
                     }
                 }
             }

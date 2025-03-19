@@ -2,8 +2,10 @@ package com.example.sicalor.ui.user
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityFormBinding
 import com.example.sicalor.ui.data.UserData
 import com.google.firebase.Firebase
@@ -16,6 +18,7 @@ class FormActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private lateinit var auth: FirebaseAuth
     private lateinit var userId: String
+    private lateinit var activityLevelList: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +32,9 @@ class FormActivity : AppCompatActivity() {
         userId = auth.currentUser!!.uid
         database = Firebase.database.reference.child("UserData")
             .child(userId)
+        activityLevelList = resources.getStringArray(R.array.activity_level)
 
+        binding.activitySpinner.adapter =ArrayAdapter(this, android.R.layout.simple_list_item_1, activityLevelList)
         binding.saveSubmit.setOnClickListener { initData() }
         binding.backButton.setOnClickListener { finish() }
 
@@ -42,7 +47,14 @@ class FormActivity : AppCompatActivity() {
         val weight = binding.etWeight.text.toString().trim()
         val height = binding.etHeight.text.toString().trim()
         val allergy = binding.etAllergy.text.toString().trim()
-        val activity = binding.etActivity.text.toString().trim()
+        val activity: String = when (binding.activitySpinner.selectedItemPosition) {
+            0 -> "Very Low"
+            1 -> "Low"
+            2 -> "Medium"
+            3 -> "High"
+            4 -> "Very High"
+            else -> "Unknown"
+        }
         var isValid = true
 
         if (name.isEmpty()) {
@@ -72,11 +84,6 @@ class FormActivity : AppCompatActivity() {
 
         if (allergy.isEmpty()) {
             binding.etAllergy.error = "This field cannot be empty"
-            isValid = false
-        }
-
-        if (activity.isEmpty()) {
-            binding.etActivity.error = "This field cannot be empty"
             isValid = false
         }
 
