@@ -12,4 +12,6 @@
 
     <string name="onboarding_title_3">Discover Daily Calorie</string>
     <string name="onboarding_desc_3">Discover your daily calorie by filling out your profile</string>
+    <string name="wrong_format_name">Format name is wrong</string>
+    <string name="wrong_format_num">Input cannot be minus</string>
 </resources>

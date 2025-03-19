@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.firebase.database)
     annotationProcessor(libs.compiler)
 
     //scan
