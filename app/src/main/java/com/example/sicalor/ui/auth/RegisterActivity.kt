@@ -60,9 +60,12 @@ class RegisterActivity : AppCompatActivity() {
                                 if (verificationTask.isSuccessful) {
                                     Toast.makeText(
                                         this,
-                                        "Verification email sent to $email. Please verify your email so you can login again.",
+                                        "Verification email sent to $email.Please verify your email before logging in.",
                                         Toast.LENGTH_LONG
                                     ).show()
+
+                                    FirebaseAuth.getInstance().signOut()
+
                                     startActivity(
                                         Intent(
                                             this@RegisterActivity,

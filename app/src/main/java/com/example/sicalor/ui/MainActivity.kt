@@ -22,17 +22,22 @@ import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityMainBinding
 import com.example.sicalor.ui.auth.LoginActivity
 import com.example.sicalor.ui.scan.CameraActivity
+import com.example.sicalor.ui.user.FormActivity
 import com.example.sicalor.utils.InitApp
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.database
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomNavView: BottomNavigationView
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+    private lateinit var userId: String
     private val cameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -65,7 +70,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         auth = Firebase.auth
+        userId = auth.currentUser!!.uid
+        database = Firebase.database.reference.child("UserData")
+            .child(userId)
         val firebaseUser = auth.currentUser
+
+        checkUserData()
 
         if (firebaseUser == null) {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -100,6 +110,14 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavView.setupWithNavController(navController)
+    }
+
+    private fun checkUserData() {
+        database.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists() && !isFinishing && !isDestroyed) {
+                startActivity(Intent(this@MainActivity, FormActivity::class.java))
+            }
+        }
     }
 
     private fun showLogoutConfirmationDialog() {
