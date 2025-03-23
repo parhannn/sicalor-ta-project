@@ -63,7 +63,7 @@ class HomeFragment : Fragment() {
                         val formatDailyCalorie = String.format("%.2f", dailyCalorie)
 
                         binding.tvName.text = if (userData.name.isNotEmpty()) "${userData.name}!" else "!"
-                        binding.tvDailyCalorie.text = "${formatDailyCalorie} kkal"
+                        binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
                     }
                 }
             }

@@ -48,7 +48,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Golongan 1"
                 android:textColor="@color/colorGrayDark"
-                android:textSize="14sp" />
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

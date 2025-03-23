@@ -15,6 +15,7 @@ class FoodAdapter(
     private val context: Context,
     private var foodList: List<FoodData>
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
+    private lateinit var onItemClickCallback: OnItemClickCallback
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemFoodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -28,6 +29,10 @@ class FoodAdapter(
 
     override fun getItemCount(): Int = foodList.size
 
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
+        this.onItemClickCallback = onItemClickCallback
+    }
+
     fun updateData(newFoodList: List<FoodData>){
         foodList = newFoodList
         notifyDataSetChanged()
@@ -36,7 +41,14 @@ class FoodAdapter(
     inner class ViewHolder(private val binding: ItemFoodBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(food: FoodData) {
             binding.foodName.text = food.name
-            binding.foodGroup.text = food.group
+            binding.foodGroup.text = when (food.group) {
+                "Golongan 1" -> "Golongan 1 (Sumber Karbohidrat)"
+                "Golongan 2" -> "Golongan 2 (Sumber Protein Hewani)"
+                "Golongan 3" -> "Golongan 3 (Sumber Protein Nabati)"
+                "Golongan 4" -> "Golongan 4 (Sayuran)"
+                "Golongan 5" -> "Golongan 5 (Buah-Buahan & Gula)"
+                else -> "Unknown"
+            }
             Glide.with(binding.foodImage.context)
                 .load(food.img)
                 .placeholder(R.drawable.ic_food_1)
@@ -49,5 +61,9 @@ class FoodAdapter(
                 context.startActivity(intent)
             }
         }
+    }
+
+    interface OnItemClickCallback {
+        fun onItemClicked(data: FoodData)
     }
 }

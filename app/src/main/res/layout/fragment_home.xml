@@ -117,7 +117,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="12dp"
                         android:fontFamily="@font/poppins_bold"
-                        android:text="0.0 kkal"
+                        android:text="0.0 kcal"
                         android:textColor="@color/colorPrimary"
                         android:textSize="24sp" />
                 </LinearLayout>

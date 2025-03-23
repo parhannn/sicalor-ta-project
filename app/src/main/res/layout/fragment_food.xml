@@ -26,9 +26,9 @@
                 android:id="@+id/search_view"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:background="@color/colorGrayLight"
+                android:background="@color/colorPrimarySoft"
                 android:inputType="text"
-                android:theme="@style/Theme.AppCompat.Light"
+                android:textCursorDrawable="@drawable/custom_cursor"
                 app:iconifiedByDefault="false"
                 app:queryBackground="@android:color/transparent"
                 app:queryHint="Search Food" />

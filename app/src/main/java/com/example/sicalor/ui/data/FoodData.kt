@@ -12,5 +12,6 @@ data class FoodData(
     val fat: String = "",
     val group: String = "",
     val name: String = "",
-    val protein: String = ""
+    val protein: String = "",
+    val portion: String = ""
 ) : Parcelable

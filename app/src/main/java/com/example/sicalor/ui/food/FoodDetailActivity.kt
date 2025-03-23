@@ -1,20 +1,72 @@
 package com.example.sicalor.ui.food
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
 import com.example.sicalor.R
+import com.example.sicalor.databinding.ActivityFoodDetailBinding
+import com.example.sicalor.ui.data.FoodData
 
 class FoodDetailActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityFoodDetailBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         supportActionBar?.hide()
-        setContentView(R.layout.activity_food_detail)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        binding = ActivityFoodDetailBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+
+        initUI()
+    }
+
+    private fun initUI() {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        val foodData = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra<FoodData>(KEY_FOOD, FoodData::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra<FoodData>(KEY_FOOD)
         }
+        if (foodData != null) {
+            getFoodData(foodData)
+        }
+
+        binding.closeButton.setOnClickListener {
+            finish()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun getFoodData(foodData: FoodData) {
+        binding.foodName.text = foodData.name
+        binding.foodGroup.text = when (foodData.group) {
+            "Golongan 1" -> "Golongan 1 (Sumber Karbohidrat)"
+            "Golongan 2" -> "Golongan 2 (Sumber Protein Hewani)"
+            "Golongan 3" -> "Golongan 3 (Sumber Protein Nabati)"
+            "Golongan 4" -> "Golongan 4 (Sayuran)"
+            "Golongan 5" -> "Golongan 5 (Buah-Buahan & Gula)"
+            else -> "unknown"
+        }
+        binding.foodDescription.text = foodData.desc
+        binding.foodPortion.text = "${foodData.portion} g"
+        binding.foodCalories.text = "${foodData.calories} kcal"
+        binding.foodCarbs.text = "${foodData.carbs} g"
+        binding.foodFat.text = "${foodData.fat} g"
+        binding.foodProtein.text = "${foodData.protein} g"
+        Glide.with(binding.foodImage.context)
+            .load(foodData.img)
+            .placeholder(R.drawable.ic_food_1)
+            .into(binding.foodImage)
+    }
+
+    companion object {
+        const val KEY_FOOD = "food"
     }
 }
