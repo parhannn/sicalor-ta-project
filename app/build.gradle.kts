@@ -54,7 +54,6 @@ dependencies {
 
     implementation(kotlin("stdlib"))
     implementation(libs.androidx.appcompat.v140)
-    implementation(libs.androidx.constraintlayout.v212)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.material.v140)
     implementation(libs.androidx.core.ktx.v170)

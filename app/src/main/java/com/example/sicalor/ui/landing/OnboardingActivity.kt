@@ -18,9 +18,6 @@ import com.example.sicalor.ui.auth.LoginActivity
 
 class OnboardingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnboardingBinding
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
-    private val delayMillis = 3000L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,63 +37,10 @@ class OnboardingActivity : AppCompatActivity() {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsetsCompat.Type.statusBars())
-        } else {
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-        }
-
-        val viewPager = binding.viewPager
-        val indicatorLayout = binding.indicatorLayout
-        val buttonStart = binding.buttonStart
-        val loginButton = binding.loginButton
-
-        val adapter = OnboardingAdapter(this)
-        viewPager.adapter = adapter
-
-        handler = Handler(Looper.getMainLooper())
-        runnable = object : Runnable {
-            var currentIndex = 0
-
-            override fun run() {
-                if (currentIndex == adapter.itemCount) {
-                    currentIndex = 0
-                }
-                viewPager.setCurrentItem(currentIndex, true)
-                currentIndex++
-                handler.postDelayed(this, delayMillis)
-            }
-        }
-
-        handler.postDelayed(runnable, delayMillis)
-
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-
-
-                for (i in 0 until indicatorLayout.childCount) {
-                    val indicator = indicatorLayout.getChildAt(i)
-                    if (i == position) {
-                        indicator.setBackgroundColor(resources.getColor(R.color.colorPrimary))  // Active color
-                    } else {
-                        indicator.setBackgroundColor(resources.getColor(R.color.colorGrayLight))  // Inactive color
-                    }
-                }
-            }
-        })
+        val buttonStart = binding.button
 
         buttonStart.text = "GET STARTED"
         buttonStart.setOnClickListener {
-            handler.removeCallbacks(runnable)
-            sharedPreferences.edit().putBoolean("has_onboarded", true).apply()
-            updateUI()
-        }
-        loginButton.setOnClickListener {
-            handler.removeCallbacks(runnable)
             sharedPreferences.edit().putBoolean("has_onboarded", true).apply()
             updateUI()
         }

@@ -42,17 +42,8 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Toast.makeText(this, "Camera permission granted.", Toast.LENGTH_SHORT).show()
-                checkGalleryPermission()
             } else {
                 Toast.makeText(this, "Camera permission denied!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    private val galleryPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                Toast.makeText(this, "Gallery permission granted.", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Gallery permission denied!", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -152,21 +143,6 @@ class MainActivity : AppCompatActivity() {
 
             else -> {
                 cameraPermission.launch(Manifest.permission.CAMERA)
-            }
-        }
-    }
-
-    private fun checkGalleryPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
-
-            }
-
-            else -> {
-                galleryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
     }
