@@ -80,8 +80,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Already registered?"
             android:fontFamily="@font/poppins_light"
+            android:text="Already registered?"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary" />
 
@@ -89,8 +89,8 @@
             android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_medium"
+            android:fontFamily="@font/poppins_bold"
             android:text="Login"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/colorPrimarySoft" />
     </LinearLayout>
 </LinearLayout>
