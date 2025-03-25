@@ -84,7 +84,7 @@ class ScheduleFragment : Fragment() {
                     for (userSnapshot in snapshot.children){
                         for (mealPlanDataSnapshot in userSnapshot.children) {
                             val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null && mealPlanData.date == date) {
+                            if (mealPlanData != null && mealPlanData.date == date && mealPlanData.userId == userId) {
                                 mealPlanDataList.add(mealPlanData)
                                 mealDataList.add(mealPlanData.mealData)
                             }
