@@ -1,12 +1,18 @@
 package com.example.sicalor.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sicalor.adapter.SchedulePlanAdapter
 import com.example.sicalor.databinding.FragmentHomeBinding
+import com.example.sicalor.ui.data.MealData
+import com.example.sicalor.ui.data.MealPlanData
 import com.example.sicalor.ui.data.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -15,13 +21,22 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HomeFragment : Fragment() {
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     private lateinit var userId: String
+    private lateinit var adapter: SchedulePlanAdapter
+    private lateinit var recyclerView: RecyclerView
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+    private var dateMealToday: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+        Date()
+    ).toString()
+    private var allPlanList: List<MealPlanData> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,12 +51,65 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        authUser()
+        setupUI()
+    }
+
+    private fun setupUI() {
+        getUserData()
+        setupRecyclerView()
+        loadMealPlan(dateMealToday)
+    }
+
+    private fun loadMealPlan(date: String) {
+        database = Firebase.database.reference.child("MealPlanData")
+
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val mealPlanDataList = mutableListOf<MealPlanData>()
+                    val mealDataList = mutableListOf<MealData>()
+                    var calorieConsumed = 0.0
+
+                    for (userSnapshot in snapshot.children) {
+                        for (mealPlanDataSnapshot in userSnapshot.children) {
+                            val mealPlanData =
+                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
+                                mealPlanDataList.add(mealPlanData)
+                                mealDataList.add(mealPlanData.mealData)
+                                calorieConsumed += mealPlanData.mealData.calories.toDouble()
+                                val formatCalorieConsumed = String.format("%.2f", calorieConsumed)
+                                binding.tvCalorieConsumed.text = formatCalorieConsumed
+                            }
+                        }
+                    }
+                    allPlanList = mealPlanDataList
+                    adapter.updateData(mealPlanDataList, mealDataList)
+                } else {
+                    Log.d("DEBUG", "No data available")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", "Error: ${error.message}")
+            }
+
+        })
+    }
+
+    private fun setupRecyclerView() {
+        adapter = SchedulePlanAdapter(requireContext(), mutableListOf(), mutableListOf())
+        recyclerView = binding.rvMealPlanToday
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun authUser() {
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser!!.uid
         database = Firebase.database.reference.child("UserData")
             .child(userId)
-
-        getUserData()
     }
 
     private fun getUserData() {

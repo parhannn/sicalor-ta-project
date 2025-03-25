@@ -37,7 +37,8 @@ class ScheduleFragment : Fragment() {
     private lateinit var userId: String
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
-    private var dateMealToday: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
+    private var dateMealToday: String =
+        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
     private var selectedDate: String = ""
     private var selectedPlanType: String = "Breakfast"
     private var allPlanList: List<MealPlanData> = emptyList()
@@ -109,9 +110,10 @@ class ScheduleFragment : Fragment() {
                     val mealPlanDataList = mutableListOf<MealPlanData>()
                     val mealDataList = mutableListOf<MealData>()
 
-                    for (userSnapshot in snapshot.children){
+                    for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                            val mealPlanData =
+                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
                             if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date && mealPlanData.type == selectedPlan) {
                                 mealPlanDataList.add(mealPlanData)
                                 mealDataList.add(mealPlanData.mealData)
