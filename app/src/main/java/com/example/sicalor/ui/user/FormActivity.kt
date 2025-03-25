@@ -34,7 +34,7 @@ class FormActivity : AppCompatActivity() {
             .child(userId)
         activityLevelList = resources.getStringArray(R.array.activity_level)
 
-        binding.activitySpinner.adapter =ArrayAdapter(this, android.R.layout.simple_list_item_1, activityLevelList)
+        binding.activitySpinner.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, activityLevelList)
         binding.saveSubmit.setOnClickListener { initData() }
         binding.backButton.setOnClickListener { finish() }
 

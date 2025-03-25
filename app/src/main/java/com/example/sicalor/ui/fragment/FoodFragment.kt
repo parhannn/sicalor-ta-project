@@ -42,8 +42,6 @@ class FoodFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = binding.verticalRecyclerView
-
         initRecyclerView()
 
         setupSearchView()
@@ -114,6 +112,7 @@ class FoodFragment : Fragment() {
 
     private fun initRecyclerView() {
         adapter = FoodAdapter(requireContext(), mutableListOf())
+        recyclerView = binding.verticalRecyclerView
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter.setOnItemClickCallback(object : FoodAdapter.OnItemClickCallback {
@@ -125,7 +124,7 @@ class FoodFragment : Fragment() {
         getFoodData()
     }
 
-    private fun showSelectedFood(article: FoodData) {
-        Toast.makeText(context, "Anda memilih artikel ${article.name}", Toast.LENGTH_SHORT).show()
+    private fun showSelectedFood(food: FoodData) {
+        Toast.makeText(context, "You choose ${food.name}", Toast.LENGTH_SHORT).show()
     }
 }
