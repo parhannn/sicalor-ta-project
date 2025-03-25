@@ -81,15 +81,15 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 return@setOnClickListener
             }
 
-            val mealId = generateMealId()
+            val savedMealId = generateMealId()
             val savedUserId = userId
             val savedSelectedDate = selectedDate
             val savedSelectedPlanType = selectedPlanType
             val savedSelectedMeal = selectedMeal!!
 
             val mealPlanData = MealPlanData(
-                mealId,
                 savedUserId,
+                savedMealId,
                 savedSelectedDate,
                 savedSelectedPlanType,
                 savedSelectedMeal
@@ -100,7 +100,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
             Log.d("DEBUG", "MealPlanData to be added: $mealPlanData")
 
             database
-                .child(userId).child(mealId).setValue(mealPlanData)
+                .child(userId).child(savedMealId).setValue(mealPlanData)
                 .addOnCompleteListener {
                 if (it.isSuccessful) {
                     Toast.makeText(requireContext(), "Meal added successfully!", Toast.LENGTH_SHORT)
