@@ -35,7 +35,6 @@ class SchedulePlanAdapter(
         schedulePlanList = newSchedulePlanList
         mealList = newMealList
         notifyDataSetChanged()
-        Toast.makeText(context, "Data Updated!", Toast.LENGTH_SHORT).show()
     }
 
     inner class ViewHolder(private val binding: ItemMealPlanBinding) : RecyclerView.ViewHolder(binding.root) {

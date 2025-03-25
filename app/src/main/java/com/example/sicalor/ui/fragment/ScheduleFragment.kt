@@ -60,6 +60,7 @@ class ScheduleFragment : Fragment() {
     private fun setupUI() {
         binding.addButton.setOnClickListener { showSheetDialog() }
         binding.selectedDate.text = dateMealToday
+        loadMealPlan(dateMealToday)
         setupDatePicker()
         setupRecyclerView()
     }
@@ -71,7 +72,7 @@ class ScheduleFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun loadMealPlan() {
+    private fun loadMealPlan(date: String) {
         database = Firebase.database.reference.child("MealPlanData")
 
         database.addValueEventListener(object : ValueEventListener {
@@ -83,7 +84,7 @@ class ScheduleFragment : Fragment() {
                     for (userSnapshot in snapshot.children){
                         for (mealPlanDataSnapshot in userSnapshot.children) {
                             val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null) {
+                            if (mealPlanData != null && mealPlanData.date == date) {
                                 mealPlanDataList.add(mealPlanData)
                                 mealDataList.add(mealPlanData.mealData)
                             }
@@ -101,27 +102,6 @@ class ScheduleFragment : Fragment() {
             }
 
         })
-
-//        database.child(userId).child("mealId").child(dateMealToday).get().addOnSuccessListener { snapshot ->
-//            if (snapshot.exists()) {
-//                val mealPlanDataList = mutableListOf<MealPlanData>()
-//                val mealDataList = mutableListOf<MealData>()
-//
-//                for (mealPlanDataSnapshot in snapshot.children) {
-//                    val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-//                    if (mealPlanData != null) {
-//                        mealPlanDataList.add(mealPlanData)
-//                        mealDataList.add(mealPlanData.mealData)
-//                    }
-//                }
-//                allPlanList = mealPlanDataList
-//                adapter.updateData(mealPlanDataList, mealDataList)
-//            } else {
-//                Log.d("DEBUG", "No data available")
-//            }
-//        }.addOnFailureListener {
-//            Log.e("FirebaseError", "Error: ${it.message}")
-//        }
     }
 
     private fun showSheetDialog() {
@@ -144,11 +124,9 @@ class ScheduleFragment : Fragment() {
                     SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(selection))
                 binding.selectedDate.text = selectedDate
                 Log.d("DEBUG", "Selected Date: $selectedDate")
-                loadMealPlan()
+                loadMealPlan(selectedDate)
             }
         }
-
-        loadMealPlan()
     }
 
     private fun authUser() {
