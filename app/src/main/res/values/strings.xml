@@ -18,4 +18,8 @@
 
     <string name="wrong_format_name">Format name is wrong</string>
     <string name="wrong_format_num">Input cannot be minus</string>
+
+    <string name="notification_title">SiCalor</string>
+    <string name="notification_message">Kalorimu hari ini sudah terpenuhi!</string>
+    <string name="notification_subtext">Reminder</string>
 </resources>

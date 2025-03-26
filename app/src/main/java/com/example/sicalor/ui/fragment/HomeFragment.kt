@@ -1,14 +1,20 @@
 package com.example.sicalor.ui.fragment
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.sicalor.R
 import com.example.sicalor.adapter.SchedulePlanAdapter
 import com.example.sicalor.databinding.FragmentHomeBinding
 import com.example.sicalor.ui.data.MealData
@@ -32,6 +38,9 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: SchedulePlanAdapter
     private lateinit var recyclerView: RecyclerView
     private var _binding: FragmentHomeBinding? = null
+    private var calorieTarget: Double = 0.0
+    private var calorieConsumedToday: Double = 0.0
+    private var isGained: Boolean = false
     private val binding get() = _binding!!
     private var dateMealToday: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
         Date()
@@ -66,51 +75,53 @@ class HomeFragment : Fragment() {
 
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val mealPlanDataList = mutableListOf<MealPlanData>()
-                    val mealDataList = mutableListOf<MealData>()
-                    var calorieConsumed = 0.0
+                try {
+                    if (calorieTarget == 0.0) {
+                        Log.d("DEBUG", "Menunggu perhitungan kebutuhan kalori harian...")
+                        return
+                    }
 
-                    for (userSnapshot in snapshot.children) {
-                        for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData =
-                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
-                                mealPlanDataList.add(mealPlanData)
-                                mealDataList.add(mealPlanData.mealData)
-                                calorieConsumed += mealPlanData.mealData.calories.toDouble()
-                                val formatCalorieConsumed = String.format("%.2f", calorieConsumed)
-                                binding.tvCalorieConsumed.text = formatCalorieConsumed
+                    if (snapshot.exists()) {
+                        val mealPlanDataList = mutableListOf<MealPlanData>()
+                        val mealDataList = mutableListOf<MealData>()
+                        var totalCalories = 0.0
+
+                        for (userSnapshot in snapshot.children) {
+                            for (mealPlanDataSnapshot in userSnapshot.children) {
+                                val mealPlanData =
+                                    mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                                if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
+                                    mealPlanDataList.add(mealPlanData)
+                                    mealDataList.add(mealPlanData.mealData)
+                                    totalCalories += mealPlanData.mealData.calories.toDouble()
+                                }
                             }
                         }
+
+                        calorieConsumedToday = totalCalories
+                        binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
+
+                        allPlanList = mealPlanDataList
+                        adapter.updateData(mealPlanDataList, mealDataList)
+
+                        if (calorieConsumedToday >= calorieTarget && !isGained) {
+                            isGained = true
+                            showCalorieNotification()
+                        }
+                    } else {
+                        Log.d("DEBUG", "No data available")
                     }
-                    allPlanList = mealPlanDataList
-                    adapter.updateData(mealPlanDataList, mealDataList)
-                } else {
-                    Log.d("DEBUG", "No data available")
+                } catch (e: Exception) {
+                    Log.e("FirebaseError", "Error: ${e.message}")
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("FirebaseError", "Error: ${error.message}")
             }
-
         })
     }
 
-    private fun setupRecyclerView() {
-        adapter = SchedulePlanAdapter(requireContext(), mutableListOf(), mutableListOf())
-        recyclerView = binding.rvMealPlanToday
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-    }
-
-    private fun authUser() {
-        auth = FirebaseAuth.getInstance()
-        userId = auth.currentUser!!.uid
-        database = Firebase.database.reference.child("UserData")
-            .child(userId)
-    }
 
     private fun getUserData() {
         database.addValueEventListener(object : ValueEventListener {
@@ -132,6 +143,7 @@ class HomeFragment : Fragment() {
 
                         binding.tvName.text = if (userData.name.isNotEmpty()) "${userData.name}!" else "!"
                         binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
+                        calorieTarget = formatDailyCalorie.toDouble()
                     }
                 }
             }
@@ -139,5 +151,52 @@ class HomeFragment : Fragment() {
                 Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun setupRecyclerView() {
+        adapter = SchedulePlanAdapter(requireContext(), mutableListOf(), mutableListOf())
+        recyclerView = binding.rvMealPlanToday
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun authUser() {
+        auth = FirebaseAuth.getInstance()
+        userId = auth.currentUser!!.uid
+        database = Firebase.database.reference.child("UserData")
+            .child(userId)
+    }
+
+    private fun showCalorieNotification() {
+        val title = getString(R.string.notification_title)
+        val message = getString(R.string.notification_message)
+
+        val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.description = CHANNEL_NAME
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+            .setContentTitle(title)
+            .setSmallIcon(R.drawable.app_logo_notification)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSubText(getString(R.string.notification_subtext))
+
+        val notification = builder.build()
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    companion object {
+        private const val NOTIFICATION_ID = 1
+        private const val CHANNEL_ID = "channel_01"
+        private const val CHANNEL_NAME = "sicalor channel"
     }
 }
