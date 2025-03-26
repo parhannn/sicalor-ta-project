@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Camera permission denied!", Toast.LENGTH_SHORT).show()
             }
         }
+    var isGained = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
