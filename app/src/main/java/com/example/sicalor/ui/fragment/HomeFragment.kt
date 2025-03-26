@@ -27,6 +27,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,31 +79,31 @@ class HomeFragment : Fragment() {
     private fun loadMealPlan(date: String) {
         database = Firebase.database.reference.child("MealPlanData")
 
-        database.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    if (calorieTarget == 0.0) {
-                        Log.d("DEBUG", "Menunggu perhitungan kebutuhan kalori harian...")
-                        return
-                    }
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                while (calorieTarget == 0.0) {
+                    Log.d("DEBUG", "Menunggu perhitungan kebutuhan kalori harian...")
+                    delay(500)
+                }
 
-                    if (snapshot.exists()) {
-                        val mealPlanDataList = mutableListOf<MealPlanData>()
-                        val mealDataList = mutableListOf<MealData>()
-                        var totalCalories = 0.0
+                val snapshot = database.get().await()
+                if (snapshot.exists()) {
+                    val mealPlanDataList = mutableListOf<MealPlanData>()
+                    val mealDataList = mutableListOf<MealData>()
+                    var totalCalories = 0.0
 
-                        for (userSnapshot in snapshot.children) {
-                            for (mealPlanDataSnapshot in userSnapshot.children) {
-                                val mealPlanData =
-                                    mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                                if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
-                                    mealPlanDataList.add(mealPlanData)
-                                    mealDataList.add(mealPlanData.mealData)
-                                    totalCalories += mealPlanData.mealData.calories.toDouble()
-                                }
+                    for (userSnapshot in snapshot.children) {
+                        for (mealPlanDataSnapshot in userSnapshot.children) {
+                            val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
+                                mealPlanDataList.add(mealPlanData)
+                                mealDataList.add(mealPlanData.mealData)
+                                totalCalories += mealPlanData.mealData.calories.toDouble()
                             }
                         }
+                    }
 
+                    withContext(Dispatchers.Main) {
                         calorieConsumedToday = totalCalories
                         binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
 
@@ -108,20 +114,15 @@ class HomeFragment : Fragment() {
                             isGained = true
                             showCalorieNotification()
                         }
-                    } else {
-                        Log.d("DEBUG", "No data available")
                     }
-                } catch (e: Exception) {
-                    Log.e("FirebaseError", "Error: ${e.message}")
+                } else {
+                    Log.d("DEBUG", "No data available")
                 }
+            } catch (e: Exception) {
+                Log.e("FirebaseError", "Error: ${e.message}")
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("FirebaseError", "Error: ${error.message}")
-            }
-        })
+        }
     }
-
 
     private fun getUserData() {
         database.addValueEventListener(object : ValueEventListener {
