@@ -261,8 +261,10 @@ class HomeFragment : Fragment() {
             .setContentTitle(title)
             .setSmallIcon(R.drawable.app_logo_notification)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSubText(getString(R.string.notification_subtext))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setAutoCancel(true)
 
         val notification = builder.build()
         notificationManager.notify(NOTIFICATION_ID, notification)

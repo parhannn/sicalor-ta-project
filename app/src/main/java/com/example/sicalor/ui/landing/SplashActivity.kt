@@ -29,7 +29,7 @@ class SplashActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             goToMainActivity()
-        }, 3000)
+        }, 2000)
     }
 
     private fun goToMainActivity() {

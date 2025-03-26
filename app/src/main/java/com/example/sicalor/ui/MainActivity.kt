@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Toast.makeText(this, "Camera permission granted.", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, CameraActivity::class.java))
             } else {
                 Toast.makeText(this, "Camera permission denied!", Toast.LENGTH_SHORT).show()
             }
