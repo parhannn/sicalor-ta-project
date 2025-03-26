@@ -96,6 +96,7 @@ class LoginActivity : AppCompatActivity() {
                                 "Please verify your email first",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            FirebaseAuth.getInstance().signOut()
                         }
                     } else {
                         showLoading(false)
