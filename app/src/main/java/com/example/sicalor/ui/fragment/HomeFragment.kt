@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
@@ -27,12 +29,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,6 +44,7 @@ class HomeFragment : Fragment() {
     private var calorieConsumedToday: Double = 0.0
     private var isGained: Boolean = false
     private val binding get() = _binding!!
+    private var selectedPlanType: String = "Breakfast"
     private var dateMealToday: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
         Date()
     ).toString()
@@ -73,20 +70,51 @@ class HomeFragment : Fragment() {
     private fun setupUI() {
         getUserData()
         setupRecyclerView()
+        setupSpinner()
+        loadAllMealPlan(dateMealToday)
         loadMealPlan(dateMealToday)
+        checkCalorie(calorieConsumedToday, calorieTarget)
+        if (!isGained) {
+            showCalorieNotification()
+        }
+    }
+
+    private fun setupSpinner() {
+        val mealTypes = arrayOf("Breakfast", "Lunch", "Dinner")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, mealTypes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.planTypeSpinner.adapter = adapter
+
+        binding.planTypeSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    selectedPlanType = mealTypes[position]
+                    loadMealPlan(dateMealToday)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+    }
+
+    private fun checkCalorie(calorieConsumedToday: Double, calorieTarget: Double) {
+        isGained = if (calorieConsumedToday >= calorieTarget) {
+            true
+        } else {
+            false
+        }
     }
 
     private fun loadMealPlan(date: String) {
+        var selectedPlan = selectedPlanType
         database = Firebase.database.reference.child("MealPlanData")
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                while (calorieTarget == 0.0) {
-                    Log.d("DEBUG", "Menunggu perhitungan kebutuhan kalori harian...")
-                    delay(500)
-                }
-
-                val snapshot = database.get().await()
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val mealPlanDataList = mutableListOf<MealPlanData>()
                     val mealDataList = mutableListOf<MealData>()
@@ -94,7 +122,46 @@ class HomeFragment : Fragment() {
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                            val mealPlanData =
+                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date && mealPlanData.type == selectedPlan) {
+                                mealPlanDataList.add(mealPlanData)
+                                mealDataList.add(mealPlanData.mealData)
+                                totalCalories += mealPlanData.mealData.calories.toDouble()
+                            }
+                        }
+                    }
+
+//                    calorieConsumedToday = totalCalories
+//                    binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
+
+                    allPlanList = mealPlanDataList
+                    adapter.updateData(mealPlanDataList, mealDataList)
+                } else {
+                    Log.d("DEBUG", "No data available")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", "Error: ${error.message}")
+            }
+        })
+    }
+
+    private fun loadAllMealPlan(date: String) {
+        database = Firebase.database.reference.child("MealPlanData")
+
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val mealPlanDataList = mutableListOf<MealPlanData>()
+                    val mealDataList = mutableListOf<MealData>()
+                    var totalCalories = 0.0
+
+                    for (userSnapshot in snapshot.children) {
+                        for (mealPlanDataSnapshot in userSnapshot.children) {
+                            val mealPlanData =
+                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
                             if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
                                 mealPlanDataList.add(mealPlanData)
                                 mealDataList.add(mealPlanData.mealData)
@@ -103,55 +170,58 @@ class HomeFragment : Fragment() {
                         }
                     }
 
-                    withContext(Dispatchers.Main) {
-                        calorieConsumedToday = totalCalories
-                        binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
+                    calorieConsumedToday = totalCalories
+                    binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
 
-                        allPlanList = mealPlanDataList
-                        adapter.updateData(mealPlanDataList, mealDataList)
-
-                        if (calorieConsumedToday >= calorieTarget && !isGained) {
-                            isGained = true
-                            showCalorieNotification()
-                        }
-                    }
+                    allPlanList = mealPlanDataList
+                    adapter.updateData(mealPlanDataList, mealDataList)
                 } else {
                     Log.d("DEBUG", "No data available")
                 }
-            } catch (e: Exception) {
-                Log.e("FirebaseError", "Error: ${e.message}")
             }
-        }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", "Error: ${error.message}")
+            }
+        })
     }
 
-    private fun getUserData() {
+    private fun getUserData() : Double {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (userSnapshot in snapshot.children) {
-                    val userData = userSnapshot.getValue(UserData::class.java)
+                try {
+                    for (userSnapshot in snapshot.children) {
+                        val userData = userSnapshot.getValue(UserData::class.java)
+                        if (userData != null) {
+                            val activityLevel = when (userData.activity) {
+                                "Very Low" -> 1.2
+                                "Low" -> 1.35
+                                "Medium" -> 1.5
+                                "High" -> 1.75
+                                "Very High" -> 1.9
+                                else -> 1.0
+                            }
+                            val dailyCalorie =
+                                userData.bmr?.toDoubleOrNull()?.times(activityLevel) ?: 0.0
+                            val formatDailyCalorie = String.format("%.2f", dailyCalorie)
 
-                    if (userData != null) {
-                        val activityLevel: Double = when (userData.activity) {
-                            "Very Low" -> 1.2
-                            "Low" -> 1.35
-                            "Medium" -> 1.5
-                            "High" -> 1.75
-                            "Very High" -> 1.9
-                            else -> 0.0
+                            binding.tvName.text =
+                                if (!userData.name.isNullOrEmpty()) "${userData.name}!" else "!"
+                            binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
+                            calorieTarget = formatDailyCalorie.toDouble()
                         }
-                        val dailyCalorie = userData.bmr.toDouble() * activityLevel
-                        val formatDailyCalorie = String.format("%.2f", dailyCalorie)
-
-                        binding.tvName.text = if (userData.name.isNotEmpty()) "${userData.name}!" else "!"
-                        binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
-                        calorieTarget = formatDailyCalorie.toDouble()
                     }
+                } catch (e: Exception) {
+                    Log.e("FirebaseError", "Error parsing user data: ${e.message}")
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
             }
         })
+
+        return calorieTarget
     }
 
     private fun setupRecyclerView() {
@@ -163,16 +233,21 @@ class HomeFragment : Fragment() {
 
     private fun authUser() {
         auth = FirebaseAuth.getInstance()
-        userId = auth.currentUser!!.uid
-        database = Firebase.database.reference.child("UserData")
-            .child(userId)
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            userId = currentUser.uid
+            database = Firebase.database.reference.child("UserData").child(userId)
+        } else {
+            Log.e("FirebaseAuth", "User not logged in!")
+        }
     }
 
     private fun showCalorieNotification() {
         val title = getString(R.string.notification_title)
         val message = getString(R.string.notification_message)
 
-        val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

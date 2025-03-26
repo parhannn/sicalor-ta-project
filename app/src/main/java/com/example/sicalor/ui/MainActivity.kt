@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,26 +42,12 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Toast.makeText(this, "Camera permission granted.", Toast.LENGTH_SHORT).show()
-                checkNotificationPermission()
             } else {
                 Toast.makeText(this, "Camera permission denied!", Toast.LENGTH_SHORT).show()
             }
         }
-    private val notificationPermission =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Notifications permission rejected", Toast.LENGTH_SHORT).show()
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        checkCameraPermission()
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -93,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavView = binding.navView
 
         binding.floatingButton.setOnClickListener {
-            startActivity(Intent(this, CameraActivity::class.java))
+            checkCameraPermission()
         }
 
         binding.logoutButton.setOnClickListener {
@@ -134,23 +119,13 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun signOut() {
-        lifecycleScope.launch {
-            val credentialManager = CredentialManager.create(this@MainActivity)
-            auth.signOut()
-            credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-            finish()
-        }
-    }
-
     private fun checkCameraPermission() {
         when {
             ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
-
+                startActivity(Intent(this, CameraActivity::class.java))
             }
 
             else -> {
@@ -159,20 +134,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            when {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-
-                }
-
-                else -> {
-                    notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            }
+    private fun signOut() {
+        lifecycleScope.launch {
+            val credentialManager = CredentialManager.create(this@MainActivity)
+            auth.signOut()
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+            finish()
         }
     }
 }
