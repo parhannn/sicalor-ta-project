@@ -3,19 +3,18 @@ package com.example.sicalor.ui.landing
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowInsetsCompat
-import androidx.viewpager2.widget.ViewPager2
+import androidx.core.content.ContextCompat
 import com.example.sicalor.R
-import com.example.sicalor.adapter.OnboardingAdapter
 import com.example.sicalor.databinding.ActivityOnboardingBinding
 import com.example.sicalor.ui.auth.LoginActivity
 
+@Suppress("DEPRECATION")
 class OnboardingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOnboardingBinding
 
@@ -31,6 +30,9 @@ class OnboardingActivity : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val hasOnboarded = sharedPreferences.getBoolean("has_onboarded", false)
+        val window: Window = window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         if (hasOnboarded) {
             updateUI()

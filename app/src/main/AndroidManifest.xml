@@ -33,7 +33,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.landing.OnboardingActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
@@ -56,6 +57,7 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
 
         <provider
