@@ -3,6 +3,7 @@ package com.example.sicalor.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -60,9 +61,20 @@ class SchedulePlanAdapter(
 
             binding.btnEdit.setOnClickListener { }
             binding.btnDelete.setOnClickListener {
-                listener?.onDeleteMealItem(schedulePlan, position)
+                showDeleteDialog(schedulePlan, position)
             }
         }
+    }
+
+    private fun showDeleteDialog(schedulePlan: MealPlanData, position: Int) {
+        AlertDialog.Builder(context)
+            .setTitle("Delete Schedule")
+            .setMessage("Are you sure you want to delete this meal schedule?")
+            .setPositiveButton("Yes") { _, _ ->
+                listener?.onDeleteMealItem(schedulePlan, position)
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 
     interface MealAdapterInterface {
