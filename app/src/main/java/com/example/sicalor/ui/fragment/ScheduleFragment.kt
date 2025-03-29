@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import java.text.SimpleDateFormat
@@ -29,7 +31,7 @@ import java.util.Date
 import java.util.Locale
 
 @SuppressLint("SimpleDateFormat")
-class ScheduleFragment : Fragment() {
+class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface {
     private lateinit var database: DatabaseReference
     private lateinit var adapter: SchedulePlanAdapter
     private lateinit var recyclerView: RecyclerView
@@ -97,6 +99,7 @@ class ScheduleFragment : Fragment() {
         recyclerView = binding.mealPlanRecyclerview
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter.setListener(this)
     }
 
     private fun loadMealPlan(date: String) {
@@ -162,5 +165,17 @@ class ScheduleFragment : Fragment() {
     private fun authUser() {
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser!!.uid
+    }
+
+    override fun onDeleteMealItem(schedulePlan: MealPlanData, position: Int) {
+        val database = FirebaseDatabase.getInstance().getReference("MealPlanData")
+
+        database.child(userId).child(schedulePlan.mealId).removeValue().addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(context, "Meal Plan Deleted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, it.exception.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".ui.fragment.MealOptionFragment">
+
+    <TextView
+        android:id="@+id/food_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Food Name"
+        android:textSize="20sp"
+        android:theme="@style/Theme.AppCompat.Light" />
+
+    <LinearLayout
+        android:id="@+id/container_calories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/calories_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Calories: " />
+
+        <TextView
+            android:id="@+id/food_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_medium"
+            android:text="100 kcal" />
+    </LinearLayout>
+
+    <com.example.sicalor.ui.customview.CustomViewInputNumber
+        android:id="@+id/et_portion"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginVertical="12dp"
+        android:hint="Portion (grams)"
+        android:textColor="@color/colorPrimary"
+        android:textCursorDrawable="@drawable/custom_cursor" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/plan_type_container"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginVertical="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:outlineSpotShadowColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_activity"
+        app:strokeColor="@color/colorOnDarkDefault"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:theme="@style/Theme.AppCompat.Light">
+
+            <Spinner
+                android:id="@+id/plan_type_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorPrimary"
+            android:fontFamily="@font/poppins_bold"
+            android:text="SAVE"
+            android:textColor="@color/colorPrimarySoft" />
+    </LinearLayout>
+</LinearLayout>

@@ -13,6 +13,7 @@
         android:background="@color/colorPrimarySoft"
         android:orientation="horizontal">
 
+
         <ImageView
             android:id="@+id/food_image"
             android:layout_width="120dp"
@@ -77,37 +78,6 @@
                     android:textColor="@color/colorGrayDark"
                     android:textSize="10sp" />
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:orientation="vertical">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btn_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorPrimary"
-                app:fabCustomSize="36dp"
-                app:layout_anchor="@id/nav"
-                app:layout_anchorGravity="end"
-                app:maxImageSize="16dp"
-                app:srcCompat="@drawable/ic_edit"
-                app:tint="@color/colorPrimarySoft" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btn_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorError"
-                app:fabCustomSize="36dp"
-                app:layout_anchor="@id/nav"
-                app:layout_anchorGravity="end"
-                app:maxImageSize="16dp"
-                app:srcCompat="@drawable/ic_delete"
-                app:tint="@color/colorOnPrimary" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

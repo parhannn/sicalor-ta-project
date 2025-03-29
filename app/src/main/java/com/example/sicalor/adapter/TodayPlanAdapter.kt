@@ -3,30 +3,20 @@ package com.example.sicalor.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sicalor.R
-import com.example.sicalor.databinding.ItemMealPlanBinding
+import com.example.sicalor.databinding.ItemTodayPlanBinding
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
-import com.example.sicalor.ui.fragment.MealOptionFragment
-import com.example.sicalor.ui.fragment.ScheduleFragment
 
-@Suppress("DEPRECATION")
-class SchedulePlanAdapter(
+class TodayPlanAdapter(
     private val context: Context,
     private var schedulePlanList: List<MealPlanData>,
     private var mealList: List<MealData>
-) : RecyclerView.Adapter<SchedulePlanAdapter.ViewHolder>() {
-    private var listener: MealAdapterInterface? = null
-    fun setListener(listener: MealAdapterInterface) {
-        this.listener = listener
-    }
-
+) : RecyclerView.Adapter<TodayPlanAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
-            ItemMealPlanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemTodayPlanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -40,14 +30,13 @@ class SchedulePlanAdapter(
 
     override fun getItemCount(): Int = schedulePlanList.size
 
-    fun updateData(newSchedulePlanList: List<MealPlanData>, newMealList: List<MealData>) {
+    fun updateData(newSchedulePlanList: List<MealPlanData>, newMealList: List<MealData>){
         schedulePlanList = newSchedulePlanList
         mealList = newMealList
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(private val binding: ItemMealPlanBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: ItemTodayPlanBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(schedulePlan: MealPlanData, meal: MealData) {
             binding.foodName.text = meal.name
             binding.foodCalories.text = "${meal.calories} kcal"
@@ -57,15 +46,6 @@ class SchedulePlanAdapter(
                 .load(meal.img)
                 .placeholder(R.drawable.ic_food_1)
                 .into(binding.foodImage)
-
-            binding.btnEdit.setOnClickListener { }
-            binding.btnDelete.setOnClickListener {
-                listener?.onDeleteMealItem(schedulePlan, position)
-            }
         }
-    }
-
-    interface MealAdapterInterface {
-        fun onDeleteMealItem(schedulePlan: MealPlanData, position: Int)
     }
 }

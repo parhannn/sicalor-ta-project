@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sicalor.R
-import com.example.sicalor.adapter.SchedulePlanAdapter
+import com.example.sicalor.adapter.TodayPlanAdapter
 import com.example.sicalor.databinding.FragmentHomeBinding
 import com.example.sicalor.ui.MainActivity
 import com.example.sicalor.ui.data.MealData
@@ -42,7 +42,7 @@ class HomeFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     private lateinit var userId: String
-    private lateinit var adapter: SchedulePlanAdapter
+    private lateinit var adapter: TodayPlanAdapter
     private lateinit var recyclerView: RecyclerView
     private var _binding: FragmentHomeBinding? = null
     private var calorieTarget: Double = 0.0
@@ -223,7 +223,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = SchedulePlanAdapter(requireContext(), mutableListOf(), mutableListOf())
+        adapter = TodayPlanAdapter(requireContext(), mutableListOf(), mutableListOf())
         recyclerView = binding.rvMealPlanToday
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
