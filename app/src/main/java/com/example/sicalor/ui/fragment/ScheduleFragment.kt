@@ -17,6 +17,7 @@ import com.example.sicalor.adapter.SchedulePlanAdapter
 import com.example.sicalor.databinding.FragmentScheduleBinding
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
+import com.example.sicalor.ui.data.NewMealPlanData
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -31,13 +32,14 @@ import java.util.Date
 import java.util.Locale
 
 @SuppressLint("SimpleDateFormat")
-class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface {
+class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, MealUpdateFragment.OnDialogSaveBtnClickListener {
     private lateinit var database: DatabaseReference
     private lateinit var adapter: SchedulePlanAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var auth: FirebaseAuth
     private lateinit var userId: String
     private var _binding: FragmentScheduleBinding? = null
+    private var fragment: MealUpdateFragment? = null
     private val binding get() = _binding!!
     private var dateMealToday: String =
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
@@ -177,5 +179,34 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface {
                 Toast.makeText(context, it.exception.toString(), Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onEditMealItem(schedulePlan: MealPlanData, position: Int) {
+        if (fragment != null)
+            childFragmentManager.beginTransaction().remove(fragment!!).commit()
+
+        val fragment = MealUpdateFragment().apply {
+            arguments = Bundle().apply {
+                putString("userId", schedulePlan.userId)
+                putString("mealId", schedulePlan.mealId)
+                putString("date", schedulePlan.date)
+                putString("type", schedulePlan.type)
+                putString("img", schedulePlan.mealData.img)
+                putString("calories", schedulePlan.mealData.calories)
+                putString("carbs", schedulePlan.mealData.carbs)
+                putString("desc", schedulePlan.mealData.desc)
+                putString("fat", schedulePlan.mealData.fat)
+                putString("group", schedulePlan.mealData.group)
+                putString("name", schedulePlan.mealData.name)
+                putString("protein", schedulePlan.mealData.protein)
+                putString("portion", schedulePlan.mealData.portion)
+            }
+        }
+        fragment!!.setListener(this)
+        fragment!!.show(childFragmentManager, MealUpdateFragment.TAG)
+    }
+
+    override fun onUpdateMeal(mealPlanData: NewMealPlanData) {
+        Log.d("DEBUG", "Updated Meal: $mealPlanData")
     }
 }

@@ -4,15 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sicalor.R
 import com.example.sicalor.databinding.ItemMealPlanBinding
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
-import com.example.sicalor.ui.fragment.MealOptionFragment
-import com.example.sicalor.ui.fragment.ScheduleFragment
 
 @Suppress("DEPRECATION")
 class SchedulePlanAdapter(
@@ -59,7 +56,9 @@ class SchedulePlanAdapter(
                 .placeholder(R.drawable.ic_food_1)
                 .into(binding.foodImage)
 
-            binding.btnEdit.setOnClickListener { }
+            binding.btnEdit.setOnClickListener {
+                listener?.onEditMealItem(schedulePlan, position)
+            }
             binding.btnDelete.setOnClickListener {
                 showDeleteDialog(schedulePlan, position)
             }
@@ -79,5 +78,6 @@ class SchedulePlanAdapter(
 
     interface MealAdapterInterface {
         fun onDeleteMealItem(schedulePlan: MealPlanData, position: Int)
+        fun onEditMealItem(schedulePlan: MealPlanData, position: Int)
     }
 }
