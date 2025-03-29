@@ -13,9 +13,10 @@ import com.example.sicalor.ui.food.FoodDetailActivity
 
 class FoodAdapter(
     private val context: Context,
-    private var foodList: List<FoodData>
+    private var foodList: MutableList<FoodData>
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
     private lateinit var onItemClickCallback: OnItemClickCallback
+    private val itemsPerPage = 10
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemFoodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,8 +35,15 @@ class FoodAdapter(
     }
 
     fun updateData(newFoodList: List<FoodData>){
-        foodList = newFoodList
+        foodList.clear()
+        foodList.addAll(newFoodList.take(itemsPerPage))
         notifyDataSetChanged()
+    }
+
+    fun loadMoreData(allData: List<FoodData>) {
+        val startPosition = foodList.size
+        foodList.addAll(allData)
+        notifyItemRangeInserted(startPosition, allData.size)
     }
 
     inner class ViewHolder(private val binding: ItemFoodBinding) : RecyclerView.ViewHolder(binding.root) {

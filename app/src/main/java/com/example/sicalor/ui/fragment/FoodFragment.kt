@@ -1,6 +1,8 @@
 package com.example.sicalor.ui.fragment
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,8 +28,13 @@ class FoodFragment : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var database: DatabaseReference
     private var allFoodList: List<FoodData> = emptyList()
+    private var filteredFoodList: List<FoodData> = emptyList()
+    private var isFiltering = false
     private var _binding: FragmentFoodBinding? = null
     private val binding get() = _binding!!
+    private var isLoading = false
+    private val itemsPerPage = 5
+    private var currentPage = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,7 +75,7 @@ class FoodFragment : Fragment() {
                     }
 
                     allFoodList = foodList
-                    adapter.updateData(foodList)
+                    adapter.updateData(allFoodList.take(itemsPerPage))
                 } else {
                     Log.d("TAG", "No data available")
                 }
@@ -93,21 +100,28 @@ class FoodFragment : Fragment() {
                 return false
             }
         })
+
         searchView.setOnCloseListener {
-            adapter.updateData(allFoodList)
+            isFiltering = false
+            currentPage = 1
+            adapter.updateData(allFoodList.take(itemsPerPage))
             false
         }
     }
 
     private fun filterFoods(query: String) {
-        val filteredFoods = if (query.isEmpty()) {
-            allFoodList
+        if (query.isEmpty()) {
+            isFiltering = false
+            currentPage = 1
+            adapter.updateData(allFoodList.take(itemsPerPage))
         } else {
-            allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            isFiltering = true
+            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            currentPage = 1
+            adapter.updateData(filteredFoodList.take(itemsPerPage))
         }
 
-        Log.d("FoodFragment", "Filtered foods: $filteredFoods for query: $query")
-        adapter.updateData(filteredFoods)
+        Log.d("FoodFragment", "Filtered foods: ${filteredFoodList.size} for query: $query")
     }
 
     private fun initRecyclerView() {
@@ -115,6 +129,7 @@ class FoodFragment : Fragment() {
         recyclerView = binding.verticalRecyclerView
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         adapter.setOnItemClickCallback(object : FoodAdapter.OnItemClickCallback {
             override fun onItemClicked(data: FoodData) {
                 showSelectedFood(data)
@@ -122,6 +137,38 @@ class FoodFragment : Fragment() {
         })
 
         getFoodData()
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                if (!isLoading && !isFiltering && lastVisibleItem >= totalItemCount - 3) {
+                    loadMoreData()
+                }
+            }
+        })
+    }
+
+    private fun loadMoreData() {
+        if (isLoading) return
+        isLoading = true
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val sourceList = if (isFiltering) filteredFoodList else allFoodList
+            val start = currentPage * itemsPerPage
+            val end = minOf(start + itemsPerPage, sourceList.size)
+
+            if (start < end) {
+                adapter.loadMoreData(sourceList.subList(start, end))
+                currentPage++
+            }
+
+            isLoading = false
+        }, 1000)
     }
 
     private fun showSelectedFood(food: FoodData) {

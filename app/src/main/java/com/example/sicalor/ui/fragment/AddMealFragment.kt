@@ -2,6 +2,8 @@ package com.example.sicalor.ui.fragment
 
 import android.R
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +47,11 @@ class AddMealFragment : BottomSheetDialogFragment() {
     private var selectedPlanType: String = "Breakfast"
     private var setPortion: String = ""
     private var selectedMeal: MealData? = null
+    private var isLoading = false
+    private val itemsPerPage = 5
+    private var currentPage = 1
+    private var filteredFoodList: List<FoodData> = emptyList()
+    private var isFiltering = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -156,6 +163,22 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 Log.d("DEBUG", "Selected Meal: $selectedMeal")
             }
         })
+
+        loadMeal()
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                if (!isLoading && !isFiltering && lastVisibleItem >= totalItemCount - 3) {
+                    loadMoreData()
+                }
+            }
+        })
     }
 
     private fun setupDatePicker() {
@@ -177,14 +200,18 @@ class AddMealFragment : BottomSheetDialogFragment() {
     }
 
     private fun filterFoods(query: String) {
-        val filteredFoods = if (query.isEmpty()) {
-            allFoodList
+        if (query.isEmpty()) {
+            isFiltering = false
+            currentPage = 1
+            adapter.updateData(allFoodList.take(itemsPerPage))
         } else {
-            allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            isFiltering = true
+            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            currentPage = 1
+            adapter.updateData(filteredFoodList.take(itemsPerPage))
         }
 
-        Log.d("FoodFragment", "Filtered foods: $filteredFoods for query: $query")
-        adapter.updateData(filteredFoods)
+        Log.d("FoodFragment", "Filtered foods: ${filteredFoodList.size} for query: $query")
     }
 
     private fun setupSearchView() {
@@ -201,7 +228,9 @@ class AddMealFragment : BottomSheetDialogFragment() {
             }
         })
         searchView.setOnCloseListener {
-            adapter.updateData(allFoodList)
+            isFiltering = false
+            currentPage = 1
+            adapter.updateData(allFoodList.take(itemsPerPage))
             false
         }
 
@@ -224,7 +253,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
                     }
 
                     allFoodList = foodList
-                    adapter.updateData(foodList)
+                    adapter.updateData(allFoodList.take(itemsPerPage))
                 } else {
                     Log.d("TAG", "No data available")
                 }
@@ -234,6 +263,24 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 Log.d("TAG", error.toString())
             }
         })
+    }
+
+    private fun loadMoreData() {
+        if (isLoading) return
+        isLoading = true
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val sourceList = if (isFiltering) filteredFoodList else allFoodList
+            val start = currentPage * itemsPerPage
+            val end = minOf(start + itemsPerPage, sourceList.size)
+
+            if (start < end) {
+                adapter.loadMoreData(sourceList.subList(start, end))
+                currentPage++
+            }
+
+            isLoading = false
+        }, 1000)
     }
 
     private fun setupSpinner() {
