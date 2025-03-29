@@ -20,6 +20,8 @@ import com.example.sicalor.ui.data.FoodData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -183,21 +185,29 @@ class AddMealFragment : BottomSheetDialogFragment() {
 
     private fun setupDatePicker() {
         binding.selectDate.setOnClickListener {
+            val today = MaterialDatePicker.todayInUtcMilliseconds()
+
+            val constraints = CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointForward.from(today))
+                .build()
+
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Meal Plan Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setSelection(today)
+                .setCalendarConstraints(constraints)
                 .build()
 
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { selection ->
-                selectedDate =
-                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(selection))
+                selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(selection))
                 binding.selectedDate.text = selectedDate
                 Log.d("DEBUG", "Selected Date: $selectedDate")
             }
         }
     }
+
+
 
     private fun filterFoods(query: String) {
         if (query.isEmpty()) {
