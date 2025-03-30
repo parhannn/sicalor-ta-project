@@ -99,7 +99,8 @@ class AddMealFragment : BottomSheetDialogFragment() {
 
                     if (meal != null &&
                         meal.mealData.name == selectedMeal!!.name &&
-                        meal.type == selectedPlanType && meal.type == selectedPlanType
+                        meal.type == selectedPlanType &&
+                        meal.date == selectedDate
                     ) {
                         isDuplicate = true
                         break
