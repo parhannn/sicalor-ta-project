@@ -137,10 +137,10 @@
         </Constraint>
     </ConstraintSet>
     <Transition
+        motion:autoTransition="animateToEnd"
         motion:constraintSetEnd="@+id/menu2"
         motion:constraintSetStart="@+id/end"
-        motion:autoTransition="animateToEnd"
-        motion:duration="3000">
+        motion:duration="5000">
         <OnSwipe motion:dragDirection="dragLeft" />
     </Transition>
     <ConstraintSet
@@ -208,9 +208,10 @@
         </Constraint>
     </ConstraintSet>
     <Transition
+        motion:autoTransition="animateToEnd"
         motion:constraintSetEnd="@+id/menu3"
         motion:constraintSetStart="@+id/menu2"
-        motion:autoTransition="animateToEnd" motion:duration="3000">
+        motion:duration="5000">
         <OnSwipe motion:dragDirection="dragLeft" />
     </Transition>
     <ConstraintSet
@@ -274,9 +275,10 @@
             motion:layout_constraintStart_toStartOf="parent" />
     </ConstraintSet>
     <Transition
+        motion:autoTransition="animateToEnd"
         motion:constraintSetEnd="@+id/menu4"
         motion:constraintSetStart="@+id/menu3"
-        motion:autoTransition="animateToEnd" motion:duration="3000">
+        motion:duration="5000">
         <OnSwipe motion:dragDirection="dragLeft" />
     </Transition>
 </MotionScene>

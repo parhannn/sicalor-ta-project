@@ -85,44 +85,59 @@ class AddMealFragment : BottomSheetDialogFragment() {
     private fun setupSubmitButton() {
         binding.submitPlanButton.setOnClickListener {
             if (selectedDate.isEmpty() || selectedMeal == null) {
-                Toast.makeText(requireContext(), "Please select date and meal!", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(requireContext(), "Please select date and meal!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val savedMealId = generateMealId()
-            val savedUserId = userId
-            val savedSelectedDate = selectedDate
-            val savedSelectedPlanType = selectedPlanType
-            val savedSelectedMeal = selectedMeal!!
+            val database = FirebaseDatabase.getInstance().getReference("MealPlanData").child(userId)
 
-            val mealPlanData = MealPlanData(
-                savedUserId,
-                savedMealId,
-                savedSelectedDate,
-                savedSelectedPlanType,
-                savedSelectedMeal
-            )
+            database.get().addOnSuccessListener { snapshot ->
+                var isDuplicate = false
 
-            val database = FirebaseDatabase.getInstance().getReference("MealPlanData")
+                for (mealSnapshot in snapshot.children) {
+                    val meal = mealSnapshot.getValue(MealPlanData::class.java)
 
-            Log.d("DEBUG", "MealPlanData to be added: $mealPlanData")
-
-            database
-                .child(userId).child(savedMealId).setValue(mealPlanData)
-                .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Toast.makeText(requireContext(), "Meal added successfully!", Toast.LENGTH_SHORT)
-                        .show()
-                    dismiss()
-                } else {
-                    Log.e("FirebaseError", "Error: ${it.exception?.message}")
-                    Toast.makeText(requireContext(), "Failed to add meal", Toast.LENGTH_SHORT)
-                        .show()
+                    if (meal != null &&
+                        meal.mealData.name == selectedMeal!!.name &&
+                        meal.type == selectedPlanType && meal.type == selectedPlanType
+                    ) {
+                        isDuplicate = true
+                        break
+                    }
                 }
+
+                if (isDuplicate) {
+                    Toast.makeText(requireContext(), "Meal with the same name, date, and type already exists!", Toast.LENGTH_SHORT).show()
+                } else {
+                    val savedMealId = generateMealId()
+                    val mealPlanData = MealPlanData(
+                        userId,
+                        savedMealId,
+                        selectedDate,
+                        selectedPlanType,
+                        selectedMeal!!
+                    )
+
+                    Log.d("DEBUG", "MealPlanData to be added: $mealPlanData")
+
+                    database.child(savedMealId).setValue(mealPlanData)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Toast.makeText(requireContext(), "Meal added successfully!", Toast.LENGTH_SHORT).show()
+                                dismiss()
+                            } else {
+                                Log.e("FirebaseError", "Error: ${it.exception?.message}")
+                                Toast.makeText(requireContext(), "Failed to add meal", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
+            }.addOnFailureListener {
+                Log.e("FirebaseError", "Error: ${it.message}")
+                Toast.makeText(requireContext(), "Error checking meal plan", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     private fun generateMealId(): String {
         val timestamp = System.currentTimeMillis().toString()

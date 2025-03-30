@@ -203,13 +203,16 @@ class HomeFragment : Fragment() {
                     calorieConsumedToday = totalCalories
                     binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
 
-                    allPlanList = mealPlanDataList
-                    adapter.updateData(mealPlanDataList, mealDataList)
+                    val progress = ((calorieConsumedToday / calorieTarget) * 100).toInt()
+                    binding.calorieProgressBar.progress = progress.coerceIn(0, 100)
 
                     val mainActivity = requireActivity() as MainActivity
                     if (calorieConsumedToday >= calorieTarget && !mainActivity.isGained) {
                         mainActivity.isGained = true
                         showCalorieNotification()
+                    }
+                    if (calorieConsumedToday >= calorieTarget) {
+                        binding.calorieReachIndicator.visibility = View.VISIBLE
                     }
                 } else {
                     Log.d("DEBUG", "No data available")
