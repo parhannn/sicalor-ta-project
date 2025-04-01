@@ -2,6 +2,7 @@ package com.example.sicalor.ui.user
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,10 @@ import com.example.sicalor.databinding.ActivityFormBinding
 import com.example.sicalor.ui.data.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
 class FormActivity : AppCompatActivity() {
@@ -19,6 +23,7 @@ class FormActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var userId: String
     private lateinit var activityLevelList: Array<String>
+    private var isNotNull = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +39,48 @@ class FormActivity : AppCompatActivity() {
             .child(userId)
         activityLevelList = resources.getStringArray(R.array.activity_level)
 
+        getUserData()
+
         binding.activitySpinner.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, activityLevelList)
         binding.saveSubmit.setOnClickListener { initData() }
         binding.backButton.setOnClickListener { finish() }
 
+    }
+
+    private fun getUserData() {
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+                    val userData = userSnapshot.getValue(UserData::class.java)
+
+                    if (userData != null) {
+                        binding.rbMale.isChecked = userData.gender == "Male"
+                        binding.rbFemale.isChecked = userData.gender == "Female"
+                        binding.etName.setText(userData.name)
+                        binding.etAge.setText(userData.age)
+                        binding.etWeight.setText(userData.weight)
+                        binding.etHeight.setText(userData.height)
+                        binding.etAllergy.setText(userData.allergy)
+                        binding.activitySpinner.setSelection(
+                            when (userData.activity) {
+                                "Very Low" -> 0
+                                "Low" -> 1
+                                "Medium" -> 2
+                                "High" -> 3
+                                "Very High" -> 4
+                                else -> 5
+                            }
+                        )
+
+                        isNotNull = true
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("Error Form", "Error checking user data: $error")
+            }
+        })
     }
 
     private fun initData() {
@@ -121,6 +164,11 @@ class FormActivity : AppCompatActivity() {
             activity,
             bmr
         )
+
+        if (isNotNull) {
+            database.removeValue()
+        }
+
         database
             .push().setValue(userData)
             .addOnCompleteListener {

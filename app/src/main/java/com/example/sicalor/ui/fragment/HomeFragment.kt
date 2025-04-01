@@ -207,11 +207,11 @@ class HomeFragment : Fragment() {
                     binding.calorieProgressBar.progress = progress.coerceIn(0, 100)
 
                     val mainActivity = requireActivity() as MainActivity
-                    if (calorieConsumedToday >= calorieTarget && !mainActivity.isGained) {
+                    if (calorieConsumedToday > calorieTarget && !mainActivity.isGained) {
                         mainActivity.isGained = true
                         showCalorieNotification()
                     }
-                    if (calorieConsumedToday >= calorieTarget) {
+                    if (calorieConsumedToday > calorieTarget) {
                         binding.calorieReachIndicator.visibility = View.VISIBLE
                     }
                 } else {

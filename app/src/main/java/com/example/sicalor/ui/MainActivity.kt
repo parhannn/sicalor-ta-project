@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     var isGained = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

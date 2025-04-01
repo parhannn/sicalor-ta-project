@@ -168,7 +168,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 val newCalorie = (portionValue * data.calories.toDouble()) / data.portion.toDouble()
 
                 selectedMeal = MealData(
-                    calories = newCalorie.toString(),
+                    calories = String.format("%.2f", newCalorie),
                     name = data.name,
                     group = data.group,
                     desc = data.desc,

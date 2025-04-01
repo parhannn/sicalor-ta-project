@@ -1,6 +1,7 @@
 package com.example.sicalor.ui.fragment
 
 import android.R
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,10 +34,11 @@ class MealUpdateFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentMealUpdateBinding.inflate(inflater, container, false)
-        database = FirebaseDatabase.getInstance().reference.child("MealPlans")
+        database = FirebaseDatabase.getInstance().reference.child("MealPlanData")
         return binding.root
     }
 
+    @SuppressLint("DefaultLocale")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
