@@ -7,11 +7,13 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.sicalor.R
+import com.example.sicalor.databinding.ActivitySplashBinding
 import com.example.sicalor.utils.InitApp
 
 @Suppress("DEPRECATION")
 class SplashActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySplashBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -23,9 +25,10 @@ class SplashActivity : AppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-        setContentView(R.layout.activity_splash)
-
         supportActionBar?.hide()
+
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         Handler(Looper.getMainLooper()).postDelayed({
             goToMainActivity()
