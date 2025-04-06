@@ -31,7 +31,7 @@ class CustomViewInputName : AppCompatEditText, View.OnFocusChangeListener {
     }
 
     private fun init() {
-        inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        inputType = InputType.TYPE_CLASS_TEXT
         background = ContextCompat.getDrawable(context, R.drawable.custom_border)
         onFocusChangeListener = this
         addTextChangedListener(object : TextWatcher {
