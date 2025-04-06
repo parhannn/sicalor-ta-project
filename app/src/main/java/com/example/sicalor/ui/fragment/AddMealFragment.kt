@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -124,7 +125,8 @@ class AddMealFragment : BottomSheetDialogFragment() {
                     database.child(savedMealId).setValue(mealPlanData)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
-                                Toast.makeText(requireContext(), "Meal added successfully!", Toast.LENGTH_SHORT).show()
+                                Snackbar.make(requireActivity().findViewById(android.R.id.content), "Meal added successfully!", Snackbar.LENGTH_SHORT)
+                                    .show()
                                 dismiss()
                             } else {
                                 Log.e("FirebaseError", "Error: ${it.exception?.message}")
