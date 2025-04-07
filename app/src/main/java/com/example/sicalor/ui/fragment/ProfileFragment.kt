@@ -6,8 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.sicalor.databinding.FragmentProfileBinding
+import com.example.sicalor.ui.auth.LoginActivity
 import com.example.sicalor.ui.data.UserData
 import com.example.sicalor.ui.user.FormActivity
 import com.google.firebase.Firebase
@@ -17,6 +22,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
@@ -49,6 +55,17 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), FormActivity::class.java)
             startActivity(intent)
         }
+
+        binding.logoutButton.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes") { _, _ ->
+                    signOut()
+                }
+                .setNegativeButton("No", null)
+                .show()
+        }
     }
 
     private fun getUserData() {
@@ -68,8 +85,21 @@ class ProfileFragment : Fragment() {
                 }
             }
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
+                if (error.toString().contains("This client does not have permission to perform this operation")) {
+                    Toast.makeText(requireContext(), "Logout Successful!", Toast.LENGTH_SHORT).show()
+                }
             }
         })
+    }
+
+    private fun signOut() {
+        lifecycleScope.launch {
+            val credentialManager = CredentialManager.create(requireActivity())
+            auth.signOut()
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            val intent = Intent(requireActivity(), LoginActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }
     }
 }

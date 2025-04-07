@@ -103,10 +103,6 @@ class MainActivity : AppCompatActivity() {
             checkCameraPermission()
         }
 
-        binding.logoutButton.setOnClickListener {
-            showLogoutConfirmationDialog()
-        }
-
         val navController = Navigation.findNavController(this, R.id.navhost)
 
         val appBarConfiguration = AppBarConfiguration(
@@ -126,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         if (fromNotification) {
             Handler(Looper.getMainLooper()).postDelayed({
                 startActivity(Intent(this, FormActivity::class.java))
-            }, 500) // atau setelah load selesai
+            }, 500)
         }
     }
 
@@ -136,17 +132,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this@MainActivity, FormActivity::class.java))
             }
         }
-    }
-
-    private fun showLogoutConfirmationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { _, _ ->
-                signOut()
-            }
-            .setNegativeButton("No", null)
-            .show()
     }
 
     private fun checkCameraPermission() {
@@ -161,16 +146,6 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 cameraPermission.launch(Manifest.permission.CAMERA)
             }
-        }
-    }
-
-    private fun signOut() {
-        lifecycleScope.launch {
-            val credentialManager = CredentialManager.create(this@MainActivity)
-            auth.signOut()
-            credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-            finish()
         }
     }
 

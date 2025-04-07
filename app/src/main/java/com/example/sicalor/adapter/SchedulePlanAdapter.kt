@@ -18,7 +18,8 @@ class SchedulePlanAdapter(
     private var mealList: List<MealData>
 ) : RecyclerView.Adapter<SchedulePlanAdapter.ViewHolder>() {
     private var listener: MealAdapterInterface? = null
-    fun setListener(listener: MealAdapterInterface) {
+
+    fun setListener (listener: MealAdapterInterface) {
         this.listener = listener
     }
 
