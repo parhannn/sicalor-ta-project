@@ -94,12 +94,18 @@ class ProfileFragment : Fragment() {
 
     private fun signOut() {
         lifecycleScope.launch {
-            val credentialManager = CredentialManager.create(requireActivity())
+            val act = activity ?: return@launch
+            val credentialManager = CredentialManager.create(act)
             auth.signOut()
             credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            val intent = Intent(requireActivity(), LoginActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
+
+            val intent = Intent(act, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+
+            act.startActivity(intent)
+            act.finish()
         }
     }
+
 }
