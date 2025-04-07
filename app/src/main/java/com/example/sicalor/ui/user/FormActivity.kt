@@ -1,5 +1,6 @@
 package com.example.sicalor.ui.user
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityFormBinding
+import com.example.sicalor.ui.MainActivity
 import com.example.sicalor.ui.data.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -173,9 +175,16 @@ class FormActivity : AppCompatActivity() {
             .push().setValue(userData)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
+                    val fromNotification = intent.getBooleanExtra("from_notification", false)
                     Toast.makeText(this@FormActivity, "Data Saved Successfully!", Toast.LENGTH_SHORT)
                         .show()
-                    finish()
+
+                    if (fromNotification) {
+                        startActivity(Intent(this@FormActivity, MainActivity::class.java))
+                        finish()
+                    } else {
+                        finish()
+                    }
                 } else {
                     Toast.makeText(this@FormActivity, "Failed to Save Data!", Toast.LENGTH_SHORT)
                         .show()

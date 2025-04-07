@@ -1,10 +1,19 @@
 package com.example.sicalor.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +33,7 @@ import com.example.sicalor.ui.auth.LoginActivity
 import com.example.sicalor.ui.scan.CameraActivity
 import com.example.sicalor.ui.user.FormActivity
 import com.example.sicalor.utils.InitApp
+import com.example.sicalor.utils.MonthlyReminderReceiver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +41,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -51,6 +62,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (checkExactAlarmPermission(this)) {
+            setMonthlyReminder(this)
+        } else {
+            requestExactAlarmPermission(this)
+        }
+
+        setMonthlyReminder(this)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -101,6 +120,14 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavView.setupWithNavController(navController)
+
+        val fromNotification = intent.getBooleanExtra("from_notification", false)
+
+        if (fromNotification) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, FormActivity::class.java))
+            }, 500) // atau setelah load selesai
+        }
     }
 
     private fun checkUserData() {
@@ -145,5 +172,52 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
             finish()
         }
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    fun setMonthlyReminder(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, MonthlyReminderReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.MONTH, 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 9)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+    }
+
+    private fun checkExactAlarmPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
+    private fun requestExactAlarmPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            intent.data = Uri.parse("package:${context.packageName}")
+            context.startActivity(intent)
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_ID = 1234
     }
 }

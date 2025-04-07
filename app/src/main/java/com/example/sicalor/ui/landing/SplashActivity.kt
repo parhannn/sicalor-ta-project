@@ -36,7 +36,11 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun goToMainActivity() {
-        startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))
+        val fromNotification = intent.getBooleanExtra("from_notification", false)
+        val mainIntent = Intent(this@SplashActivity, OnboardingActivity::class.java).apply {
+            putExtra("from_notification", fromNotification)
+        }
+        startActivity(mainIntent)
         finish()
     }
 }

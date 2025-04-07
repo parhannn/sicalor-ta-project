@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityLoginBinding
 import com.example.sicalor.ui.MainActivity
+import com.example.sicalor.ui.fragment.ForgotPasswordFragment
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
@@ -31,9 +32,10 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), ForgotPasswordFragment.OnDialogForgotPasswordListener {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var forgotPasswordFragment: ForgotPasswordFragment
     private val notificationPermission =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -57,6 +59,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = Firebase.auth
+        forgotPasswordFragment = ForgotPasswordFragment()
+        forgotPasswordFragment.setListener(this)
 
         binding.googleSignInBtn.setOnClickListener {
             signInWithGoogle()
@@ -72,6 +76,11 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
+
+        binding.forgotPassword.setOnClickListener {
+            forgotPasswordFragment.show(supportFragmentManager, "ForgotPasswordFragment")
+        }
+
         checkNotificationPermission()
     }
 
@@ -190,7 +199,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateUI(currentUser: FirebaseUser?) {
         if (currentUser != null) {
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            val fromNotification = intent.getBooleanExtra("from_notification", false)
+            val mainIntent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+                putExtra("from_notification", fromNotification)
+            }
+            startActivity(mainIntent)
             finish()
         }
     }
@@ -221,5 +234,9 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "LoginActivity"
+    }
+
+    override fun onSendEmailForgotPassword(email: String) {
+        Log.d("DEBUG", "Email sent to $email")
     }
 }

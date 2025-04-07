@@ -49,7 +49,11 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        startActivity(Intent(this@OnboardingActivity, LoginActivity::class.java))
+        val fromNotification = intent.getBooleanExtra("from_notification", false)
+        val mainIntent = Intent(this@OnboardingActivity, LoginActivity::class.java).apply {
+            putExtra("from_notification", fromNotification)
+        }
+        startActivity(mainIntent)
         finish()
     }
 }
