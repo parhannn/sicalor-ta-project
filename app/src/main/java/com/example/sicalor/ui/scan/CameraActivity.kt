@@ -1,9 +1,10 @@
 package com.example.sicalor.ui.scan
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -15,7 +16,10 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -23,12 +27,26 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.sicalor.databinding.ActivityCameraBinding
+import com.example.sicalor.ui.data.BoundingBox
+import com.example.sicalor.ui.scan.Constants.LABELS_PATH
+import com.example.sicalor.ui.scan.Constants.MODEL_PATH
 import com.example.sicalor.utils.createCustomTempFile
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class CameraActivity : AppCompatActivity() {
+@Suppress("DEPRECATION")
+class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
     private lateinit var binding: ActivityCameraBinding
+    private lateinit var cameraExecutor: ExecutorService
+    private lateinit var detector: Detector
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+    private var camera: Camera? = null
+    private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
+    private var imageAnalyzer: ImageAnalysis? = null
+    private var lastDetection: List<BoundingBox>? = null
+    private var cameraProvider: ProcessCameraProvider? = null
+    private val isFrontCamera = false
     private val launcherGallery = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -80,6 +98,11 @@ class CameraActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
         }
+
+        detector = Detector(applicationContext, MODEL_PATH, LABELS_PATH, this)
+        detector.setup()
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
         startCamera()
 
@@ -138,39 +161,98 @@ class CameraActivity : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-                }
-
-            imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(RATIO_1_1)
-                .build()
-
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageCapture
-                )
-            } catch (exception: Exception) {
-                Toast.makeText(
-                    this@CameraActivity,
-                    "Failed to start camera.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Log.e(TAG, "startCamera: ${exception.message}")
-            }
+            cameraProvider = cameraProviderFuture.get()
+            bindCameraUseCase()
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun bindCameraUseCase() {
+        val provider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
+
+        val rotation = binding.viewFinder.display.rotation
+        preview = Preview.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            .setTargetRotation(rotation)
+            .build()
+
+        imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setTargetRotation(rotation)
+            .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .build()
+            .also { analyzer ->
+                analyzer.setAnalyzer(cameraExecutor) { imageProxy ->
+                    val bitmapBuffer = Bitmap.createBitmap(
+                        imageProxy.width,
+                        imageProxy.height,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    imageProxy.use {
+                        bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
+                    }
+                    val matrix = Matrix().apply {
+                        postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
+                        if (isFrontCamera) {
+                            postScale(-1f, 1f, imageProxy.width.toFloat(), imageProxy.height.toFloat())
+                        }
+                    }
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        bitmapBuffer, 0, 0, bitmapBuffer.width, bitmapBuffer.height, matrix, true
+                    )
+                    detector.detect(rotatedBitmap)
+                }
+            }
+
+        imageCapture = ImageCapture.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            .build()
+
+        provider.unbindAll()
+        try {
+            camera = provider.bindToLifecycle(
+                this,
+                cameraSelector,
+                preview,
+                imageCapture,
+                imageAnalyzer
+            )
+            preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+        } catch (exception: Exception) {
+            Toast.makeText(
+                this@CameraActivity,
+                "Failed to start camera.",
+                Toast.LENGTH_SHORT
+            ).show()
+            Log.e(TAG, "startCamera: ${exception.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraProvider?.unbindAll()
+        imageAnalyzer?.clearAnalyzer()
+    }
+
+    override fun onEmptyDetect() {
+        binding.overlay.clear()
+        lastDetection = null
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+        lastDetection = boundingBoxes
+        runOnUiThread {
+            binding.inferenceTime.text = "${inferenceTime}ms"
+            binding.overlay.apply {
+                setResults(boundingBoxes)
+                invalidate()
+            }
+        }
     }
 
     companion object {
         private const val TAG = "CameraActivity"
         const val EXTRA_CAMERAX_IMAGE = "CameraX Image"
-        const val RATIO_1_1 = 1 / 1
     }
 }
