@@ -224,10 +224,8 @@ class ResultActivity : AppCompatActivity() {
                                 )
                             }) {
                             detectedList.add(food)
-                            binding.tvNoFoodDetected.visibility = View.GONE
                         } else {
                             allOtherFoods.add(food)
-                            binding.tvNoFoodDetected.visibility = View.VISIBLE
                         }
                     }
                 }
