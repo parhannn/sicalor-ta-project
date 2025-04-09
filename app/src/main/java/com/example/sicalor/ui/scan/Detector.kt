@@ -127,7 +127,7 @@ class Detector (
         return when (rawLabel.lowercase()) {
             "nasi_putih" -> "Nasi Putih"
             "jagung_rebus" -> "Jagung Rebus"
-            "ayam_goreng_paha", "paha_ayam_goreng" -> "Ayam Goreng Paha"
+            "ayam_goreng_paha", "paha_ayam_goreng" -> "Paha Ayam Goreng"
             "telur_ayam_rebus" -> "Telur Rebus"
             "tempe_goreng" -> "Tempe Goreng"
             "tahu_goreng" -> "Tahu Goreng"
