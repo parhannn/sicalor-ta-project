@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
@@ -31,6 +32,7 @@ import com.example.sicalor.ui.data.BoundingBox
 import com.example.sicalor.ui.scan.Constants.LABELS_PATH
 import com.example.sicalor.ui.scan.Constants.MODEL_PATH
 import com.example.sicalor.utils.createCustomTempFile
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -51,7 +53,7 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            val intent = Intent(this, ScanActivity::class.java).apply {
+            val intent = Intent(this, ResultActivity::class.java).apply {
                 putExtra(EXTRA_CAMERAX_IMAGE, uri.toString())
             }
             startActivity(intent)
@@ -139,7 +141,26 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val savedUri = Uri.fromFile(photoFile)
-                    val intent = Intent(this@CameraActivity, ScanActivity::class.java).apply {
+                    val containerView = binding.root
+                    val bitmap = Bitmap.createBitmap(
+                        containerView.width,
+                        containerView.height,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(bitmap)
+                    containerView.draw(canvas)
+
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    val byteArray = stream.toByteArray()
+
+                    val intent = Intent(this@CameraActivity, ResultActivity::class.java).apply {
+                        putExtra(EXTRA_CAPTURE_IMAGE, byteArray)
+
+                        lastDetection?.let {
+                            putExtra(EXTRA_DETECTION_LIST, ArrayList(it))
+                        }
+
                         putExtra(EXTRA_CAMERAX_IMAGE, savedUri.toString())
                     }
                     startActivity(intent)
@@ -254,5 +275,7 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
     companion object {
         private const val TAG = "CameraActivity"
         const val EXTRA_CAMERAX_IMAGE = "CameraX Image"
+        const val EXTRA_CAPTURE_IMAGE = "capturedImage"
+        const val EXTRA_DETECTION_LIST = "detectionList"
     }
 }

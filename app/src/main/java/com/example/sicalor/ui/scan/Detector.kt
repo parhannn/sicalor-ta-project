@@ -124,9 +124,21 @@ class Detector (
     }
 
     private fun formatLabel(rawLabel: String): String {
-        return rawLabel
-            .split("_")
-            .joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }
+        return when (rawLabel.lowercase()) {
+            "nasi_putih" -> "Nasi Putih"
+            "jagung_rebus" -> "Jagung Rebus"
+            "ayam_goreng_paha", "paha_ayam_goreng" -> "Ayam Goreng Paha"
+            "telur_ayam_rebus" -> "Telur Rebus"
+            "tempe_goreng" -> "Tempe Goreng"
+            "tahu_goreng" -> "Tahu Goreng"
+            "tumis_kangkung" -> "Tumis Kangkung"
+            "bening_bayam" -> "Bening Bayam"
+            "buah_pisang", "pisang" -> "Pisang"
+            "buah_jeruk", "jeruk" -> "Jeruk"
+            else -> {
+                rawLabel.split("_").joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }
+            }
+        }
     }
 
     private fun applyNMS(boxes: List<BoundingBox>): MutableList<BoundingBox> {

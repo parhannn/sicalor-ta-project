@@ -32,7 +32,7 @@
             android:name=".ui.user.FormActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.scan.ScanActivity"
+            android:name=".ui.scan.ResultActivity"
             android:exported="false" />
         <activity
             android:name=".ui.landing.OnboardingActivity"

@@ -170,7 +170,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 val newCalorie = (portionValue * data.calories.toDouble()) / data.portion.toDouble()
 
                 selectedMeal = MealData(
-                    calories = String.format("%.2f", newCalorie),
+                    calories = String.format(Locale.ENGLISH,"%.2f", newCalorie),
                     name = data.name,
                     group = data.group,
                     desc = data.desc,
@@ -224,8 +224,6 @@ class AddMealFragment : BottomSheetDialogFragment() {
             }
         }
     }
-
-
 
     private fun filterFoods(query: String) {
         if (query.isEmpty()) {
