@@ -47,6 +47,12 @@ class MealAdapter(
         notifyItemRangeInserted(startPosition, allData.size)
     }
 
+    fun clearSelection() {
+        val prevSelected = selectedPosition
+        selectedPosition = RecyclerView.NO_POSITION
+        notifyItemChanged(prevSelected)
+    }
+
     inner class ViewHolder(private val binding: ItemFoodPlanBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(food: FoodData) {
             binding.foodName.text = food.name

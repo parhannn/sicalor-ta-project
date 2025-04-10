@@ -301,6 +301,7 @@ class ResultActivity : AppCompatActivity() {
 
         detectedMealAdapter.setOnItemClickCallback(object : MealAdapter.OnItemClickCallback {
             override fun onItemClicked(data: FoodData) {
+                allMealAdapter.clearSelection()
                 handleClick(data)
             }
         })
@@ -330,6 +331,7 @@ class ResultActivity : AppCompatActivity() {
 
         allMealAdapter.setOnItemClickCallback(object : MealAdapter.OnItemClickCallback {
             override fun onItemClicked(data: FoodData) {
+                detectedMealAdapter.clearSelection()
                 handleClick(data)
             }
         })
