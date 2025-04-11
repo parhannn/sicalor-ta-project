@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
     private var dateMealToday: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
         Date()
     ).toString()
-    private var allPlanList: List<MealPlanData> = emptyList()
+    private var allPlanList: MutableList<MealPlanData>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +69,11 @@ class HomeFragment : Fragment() {
 
         authUser()
         setupUI()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        allPlanList?.clear()
     }
 
     private fun setupUI() {

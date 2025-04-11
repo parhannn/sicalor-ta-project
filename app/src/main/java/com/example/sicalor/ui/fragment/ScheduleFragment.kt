@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.sicalor.adapter.SchedulePlanAdapter
 import com.example.sicalor.databinding.FragmentScheduleBinding
 import com.example.sicalor.ui.data.MealData
@@ -45,7 +46,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
     private var selectedDate: String = ""
     private var selectedPlanType: String = "Breakfast"
-    private var allPlanList: List<MealPlanData> = emptyList()
+    private var allPlanList: MutableList<MealPlanData> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,6 +62,11 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
         super.onViewCreated(view, savedInstanceState)
         authUser()
         setupUI()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        allPlanList.clear()
     }
 
     private fun setupUI() {

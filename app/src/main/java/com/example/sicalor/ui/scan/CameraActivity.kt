@@ -49,19 +49,6 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
     private var lastDetection: List<BoundingBox>? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private val isFrontCamera = false
-    private val launcherGallery = registerForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            val intent = Intent(this, ResultActivity::class.java).apply {
-                putExtra(EXTRA_CAMERAX_IMAGE, uri.toString())
-            }
-            startActivity(intent)
-            finish()
-        } else {
-            Log.d("Photo Picker", "No media selected")
-        }
-    }
     private val orientationEventListener by lazy {
         object : OrientationEventListener(this) {
             override fun onOrientationChanged(orientation: Int) {
@@ -115,17 +102,13 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
             startCamera()
         }
         binding.captureImage.setOnClickListener { captureImage() }
-        binding.openGallery.setOnClickListener { startGallery() }
+        binding.openGallery.setOnClickListener {  }
         binding.backButton.setOnClickListener { finish() }
     }
 
     override fun onStart() {
         super.onStart()
         orientationEventListener.enable()
-    }
-
-    private fun startGallery() {
-        launcherGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     private fun captureImage() {

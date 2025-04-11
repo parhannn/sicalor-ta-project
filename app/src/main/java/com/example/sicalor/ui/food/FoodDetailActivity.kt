@@ -2,6 +2,7 @@ package com.example.sicalor.ui.food
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityFoodDetailBinding
 import com.example.sicalor.ui.data.FoodData
 
+@Suppress("DEPRECATION")
 class FoodDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFoodDetailBinding
 
@@ -29,16 +31,16 @@ class FoodDetailActivity : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         val foodData = if (Build.VERSION.SDK_INT >= 33) {
-            intent.getParcelableExtra<FoodData>(KEY_FOOD, FoodData::class.java)
+            intent.getSerializableExtra<FoodData>(KEY_FOOD, FoodData::class.java)
         } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra<FoodData>(KEY_FOOD)
+            intent.getSerializableExtra(KEY_FOOD) as? FoodData
         }
         if (foodData != null) {
             getFoodData(foodData)
         }
 
         binding.closeButton.setOnClickListener {
+            clearFoodData()
             finish()
         }
     }
@@ -64,6 +66,24 @@ class FoodDetailActivity : AppCompatActivity() {
             .load(foodData.img)
             .placeholder(R.drawable.ic_food_1)
             .into(binding.foodImage)
+    }
+
+    private fun clearFoodData() {
+        binding.foodName.text = ""
+        binding.foodGroup.text = ""
+        binding.foodDescription.text = ""
+        binding.foodPortion.text = ""
+        binding.foodCalories.text = ""
+        binding.foodCarbs.text = ""
+        binding.foodFat.text = ""
+        binding.foodProtein.text = ""
+
+        Glide.with(binding.foodImage.context).clear(binding.foodImage)
+
+        Glide.get(this).clearMemory()
+        Thread {
+            Glide.get(this).clearDiskCache()
+        }.start()
     }
 
     companion object {

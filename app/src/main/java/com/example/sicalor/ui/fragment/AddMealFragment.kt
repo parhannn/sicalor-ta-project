@@ -45,7 +45,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
     private lateinit var userId: String
     private var _binding: FragmentAddMealBinding? = null
     private val binding get() = _binding!!
-    private var allFoodList: List<FoodData> = emptyList()
+    private var allFoodList: MutableList<FoodData> = mutableListOf()
     private var selectedDate: String = ""
     private var selectedPlanType: String = "Breakfast"
     private var setPortion: String = ""
@@ -53,7 +53,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
     private var isLoading = false
     private val itemsPerPage = 5
     private var currentPage = 1
-    private var filteredFoodList: List<FoodData> = emptyList()
+    private var filteredFoodList: MutableList<FoodData> = mutableListOf()
     private var isFiltering = false
 
     override fun onCreateView(
@@ -73,8 +73,25 @@ class AddMealFragment : BottomSheetDialogFragment() {
         setupUI()
     }
 
+    override fun onDestroyView() {
+        allFoodList.clear()
+        filteredFoodList.clear()
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun setupUI() {
-        binding.backButton.setOnClickListener { dismiss() }
+        binding.backButton.setOnClickListener {
+            userId = ""
+            selectedDate = ""
+            selectedPlanType = ""
+            setPortion = ""
+            selectedMeal = null
+            isLoading = false
+            allFoodList.clear()
+            filteredFoodList.clear()
+            dismiss()
+        }
         setupDatePicker()
         setupSpinner()
         setupPortion()
@@ -99,7 +116,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
                     val meal = mealSnapshot.getValue(MealPlanData::class.java)
 
                     if (meal != null &&
-                        meal.mealData.name == selectedMeal!!.name &&
+                        meal.mealData?.name == selectedMeal!!.name &&
                         meal.type == selectedPlanType &&
                         meal.date == selectedDate
                     ) {
@@ -112,7 +129,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
                     Toast.makeText(requireContext(), "Meal with the same name, date, and type already exists!", Toast.LENGTH_SHORT).show()
                 } else {
                     val savedMealId = generateMealId()
-                    val mealPlanData = MealPlanData(
+                    var mealPlanData = MealPlanData(
                         userId,
                         savedMealId,
                         selectedDate,
@@ -127,6 +144,14 @@ class AddMealFragment : BottomSheetDialogFragment() {
                             if (it.isSuccessful) {
                                 Snackbar.make(requireActivity().findViewById(android.R.id.content), "Meal added successfully!", Snackbar.LENGTH_SHORT)
                                     .show()
+                                allFoodList.clear()
+                                filteredFoodList.clear()
+                                userId = ""
+                                selectedDate = ""
+                                selectedPlanType = ""
+                                setPortion = ""
+                                selectedMeal = null
+                                isLoading = false
                                 dismiss()
                             } else {
                                 Log.e("FirebaseError", "Error: ${it.exception?.message}")
@@ -232,7 +257,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
             adapter.updateData(allFoodList.take(itemsPerPage))
         } else {
             isFiltering = true
-            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }.toMutableList()
             currentPage = 1
             adapter.updateData(filteredFoodList.take(itemsPerPage))
         }

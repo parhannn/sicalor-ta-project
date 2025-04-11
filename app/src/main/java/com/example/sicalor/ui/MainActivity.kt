@@ -27,6 +27,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityMainBinding
 import com.example.sicalor.ui.auth.LoginActivity
@@ -124,6 +125,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, FormActivity::class.java))
             }, 500)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Glide.get(this).clearMemory()
+        Thread {
+            Glide.get(this).clearDiskCache()
+        }.start()
     }
 
     private fun checkUserData() {

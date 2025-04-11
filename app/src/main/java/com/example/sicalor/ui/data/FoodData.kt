@@ -1,9 +1,7 @@
 package com.example.sicalor.ui.data
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
-@Parcelize
 data class FoodData(
     val img: String = "",
     val calories: String = "",
@@ -14,4 +12,4 @@ data class FoodData(
     val name: String = "",
     val protein: String = "",
     val portion: String = ""
-) : Parcelable
+) : Serializable

@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,19 +52,19 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private lateinit var userId: String
     private lateinit var searchView: SearchView
-    private var allFoodList: List<FoodData> = emptyList()
+    private var allFoodList: MutableList<FoodData> = mutableListOf()
     private var currentImageUri: Uri? = null
-    private var detectedFoodList: List<BoundingBox> = emptyList()
+    private var detectedFoodList: MutableList<BoundingBox> = mutableListOf()
     private var currentImageBitmap: Bitmap? = null
     private var currentPage = 1
-    private var fullFoodList: List<FoodData> = emptyList()
+    private var fullFoodList: MutableList<FoodData> = mutableListOf()
     private var isLoading = false
     private var selectedMeal: MealData? = null
     private val itemsPerPage = 5
     private var selectedDate: String = ""
     private var selectedPlanType: String = "Breakfast"
     private var setPortion: String = ""
-    private var filteredFoodList: List<FoodData> = emptyList()
+    private var filteredFoodList: MutableList<FoodData> = mutableListOf()
     private var isFiltering = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +89,11 @@ class ResultActivity : AppCompatActivity() {
         setupSubmitButton()
     }
 
+    override fun onDestroy() {
+        deleteCapturedResult()
+        super.onDestroy()
+    }
+
     private fun setupSubmitButton() {
         binding.addMealButton.setOnClickListener {
             if (selectedDate.isEmpty() || selectedMeal == null) {
@@ -108,7 +114,7 @@ class ResultActivity : AppCompatActivity() {
                     val meal = mealSnapshot.getValue(MealPlanData::class.java)
 
                     if (meal != null &&
-                        meal.mealData.name == selectedMeal!!.name &&
+                        meal.mealData?.name == selectedMeal!!.name &&
                         meal.type == selectedPlanType &&
                         meal.date == selectedDate
                     ) {
@@ -144,6 +150,9 @@ class ResultActivity : AppCompatActivity() {
                                     Snackbar.LENGTH_SHORT
                                 )
                                     .show()
+                                allFoodList.clear()
+                                filteredFoodList.clear()
+
                             } else {
                                 Log.e("FirebaseError", "Error: ${it.exception?.message}")
                                 Toast.makeText(
@@ -169,7 +178,10 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun handleUI() {
-        binding.backButton.setOnClickListener { onBackPressed() }
+        binding.backButton.setOnClickListener {
+            deleteCapturedResult()
+            onBackPressed()
+        }
         val imageUriString = intent.getStringExtra(CameraActivity.EXTRA_CAMERAX_IMAGE)
         val imageByteArray = intent.getByteArrayExtra(CameraActivity.EXTRA_CAPTURE_IMAGE)
         val detectionList =
@@ -196,6 +208,26 @@ class ResultActivity : AppCompatActivity() {
             binding.tvNoFoodDetected.visibility = View.VISIBLE
         }
     }
+
+    private fun deleteCapturedResult() {
+        currentImageUri?.let {
+            try {
+                val file = File(it.path!!)
+                if (file.exists()) {
+                    file.delete()
+                    Log.d("ResultActivity", "Deleted image file: ${file.absolutePath}")
+                } else { }
+            } catch (e: Exception) {
+                Log.e("ResultActivity", "Error deleting image file: ${e.message}")
+            }
+        }
+
+        currentImageBitmap?.recycle()
+        currentImageBitmap = null
+
+        detectedFoodList.clear()
+    }
+
 
     private fun showImageUri() {
         currentImageUri?.let {
@@ -290,7 +322,7 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(foodList: List<FoodData>) {
-        fullFoodList = foodList
+        fullFoodList = foodList.toMutableList()
         currentPage = 0
         detectedMealAdapter = MealAdapter(this, mutableListOf())
         rvDetectedMeal = binding.detectedMealRecyclerview
@@ -382,7 +414,7 @@ class ResultActivity : AppCompatActivity() {
             adapter.updateData(allFoodList.take(itemsPerPage))
         } else {
             isFiltering = true
-            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }.toMutableList()
             currentPage = 1
             adapter.updateData(filteredFoodList.take(itemsPerPage))
         }

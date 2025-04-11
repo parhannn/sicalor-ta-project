@@ -12,6 +12,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.sicalor.adapter.FoodAdapter
 import com.example.sicalor.databinding.FragmentFoodBinding
 import com.example.sicalor.ui.data.FoodData
@@ -27,8 +28,8 @@ class FoodFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: SearchView
     private lateinit var database: DatabaseReference
-    private var allFoodList: List<FoodData> = emptyList()
-    private var filteredFoodList: List<FoodData> = emptyList()
+    private var allFoodList: MutableList<FoodData> = mutableListOf()
+    private var filteredFoodList: MutableList<FoodData> = mutableListOf()
     private var isFiltering = false
     private var _binding: FragmentFoodBinding? = null
     private val binding get() = _binding!!
@@ -57,6 +58,8 @@ class FoodFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        allFoodList?.clear()
+        filteredFoodList?.clear()
     }
 
     private fun getFoodData() {
@@ -75,7 +78,7 @@ class FoodFragment : Fragment() {
                     }
 
                     allFoodList = foodList
-                    adapter.updateData(allFoodList.take(itemsPerPage))
+                    adapter.updateData(allFoodList!!.take(itemsPerPage))
                 } else {
                     Log.d("TAG", "No data available")
                 }
@@ -104,7 +107,7 @@ class FoodFragment : Fragment() {
         searchView.setOnCloseListener {
             isFiltering = false
             currentPage = 1
-            adapter.updateData(allFoodList.take(itemsPerPage))
+            adapter.updateData(allFoodList!!.take(itemsPerPage))
             false
         }
     }
@@ -113,15 +116,15 @@ class FoodFragment : Fragment() {
         if (query.isEmpty()) {
             isFiltering = false
             currentPage = 1
-            adapter.updateData(allFoodList.take(itemsPerPage))
+            adapter.updateData(allFoodList!!.take(itemsPerPage))
         } else {
             isFiltering = true
-            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }
+            filteredFoodList = allFoodList!!.filter { it.name.contains(query, ignoreCase = true) }.toMutableList()
             currentPage = 1
-            adapter.updateData(filteredFoodList.take(itemsPerPage))
+            adapter.updateData(filteredFoodList!!.take(itemsPerPage))
         }
 
-        Log.d("FoodFragment", "Filtered foods: ${filteredFoodList.size} for query: $query")
+        Log.d("FoodFragment", "Filtered foods: ${filteredFoodList!!.size} for query: $query")
     }
 
     private fun initRecyclerView() {
@@ -160,10 +163,10 @@ class FoodFragment : Fragment() {
         Handler(Looper.getMainLooper()).postDelayed({
             val sourceList = if (isFiltering) filteredFoodList else allFoodList
             val start = currentPage * itemsPerPage
-            val end = minOf(start + itemsPerPage, sourceList.size)
+            val end = minOf(start + itemsPerPage, sourceList!!.size)
 
             if (start < end) {
-                adapter.loadMoreData(sourceList.subList(start, end))
+                adapter.loadMoreData(sourceList!!.subList(start, end))
                 currentPage++
             }
 
