@@ -97,6 +97,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit.v113)
     androidTestImplementation(libs.androidx.espresso.core.v340)
+    androidTestImplementation(libs.androidx.test.rules)
 
     //home
     implementation(libs.androidx.navigation.fragment.ktx.v274)
