@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sicalor.adapter.SchedulePlanAdapter
 import com.example.sicalor.databinding.FragmentScheduleBinding
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 import com.example.sicalor.ui.data.NewMealPlanData
+import com.example.sicalor.ui.data.UserData
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -43,6 +45,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
     private lateinit var userId: String
     private var _binding: FragmentScheduleBinding? = null
     private var fragment: MealUpdateFragment? = null
+    private var calorieTarget: Double = 0.0
     private val binding get() = _binding!!
     private var dateMealToday: String =
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
@@ -76,10 +79,28 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
         selectedDate = dateMealToday
         binding.selectedDate.text = dateMealToday
 
+        getUserData()
         setupSpinner()
         setupDatePicker()
         setupRecyclerView()
         loadMealPlan(selectedDate)
+    }
+
+    private fun getUserData(){
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+                    val userData = userSnapshot.getValue(UserData::class.java)
+                    if (userData != null) {
+                        calorieTarget = userData.dailyCalorie.toDouble()
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupSpinner() {
@@ -136,9 +157,11 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
                     allPlanList = mealPlanDataList
 
                     if (allPlanList!!.isNotEmpty()) {
+                        loadCalorieHistory(date)
                         binding.noDataFoundPlaceholder.visibility = View.GONE
                         adapter.updateData(mealPlanDataList, mealDataList)
                     } else {
+                        loadCalorieHistory(date)
                         binding.noDataFoundPlaceholder.visibility = View.VISIBLE
                         adapter.updateData(emptyList(), emptyList())
                     }
@@ -151,6 +174,32 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
                 Log.e("FirebaseError", "Error: ${error.message}")
             }
 
+        })
+    }
+
+    private fun loadCalorieHistory(date: String) {
+        val calorieRef = Firebase.database.reference
+            .child("CalorieHistoryData")
+            .child(userId)
+            .child(date)
+
+        calorieRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val calorieHistoryData = snapshot.getValue(CalorieHistoryData::class.java)
+                    if (calorieHistoryData != null) {
+                        binding.tvCalorieConsumed.text = calorieHistoryData.updatedConsumed
+                        binding.tvCalorieRemaining.text = calorieHistoryData.remainingCalories
+                    }
+                } else {
+                    binding.tvCalorieConsumed.text = "0.00"
+                    binding.tvCalorieRemaining.text = "0.00"
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", "Error: ${error.message}")
+            }
         })
     }
 
@@ -189,14 +238,48 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
     private fun authUser() {
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser!!.uid
+        database = Firebase.database.reference.child("UserData").child(userId)
     }
 
     override fun onDeleteMealItem(schedulePlan: MealPlanData, position: Int) {
-        val database = FirebaseDatabase.getInstance().getReference("MealPlanData")
+        val database = FirebaseDatabase.getInstance().getReference()
+        val mealRef = database.child("MealPlanData")
+        val calRef = database.child("CalorieHistoryData")
 
-        database.child(userId).child(schedulePlan.mealId).removeValue().addOnCompleteListener {
+        mealRef.child(userId).child(schedulePlan.mealId).removeValue().addOnCompleteListener {
             if (it.isSuccessful) {
                 Toast.makeText(context, "Meal Plan Deleted", Toast.LENGTH_SHORT).show()
+
+                calRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (userSnapshot in snapshot.children) {
+                            for (calorieHistoryDataSnapshot in userSnapshot.children) {
+                                val calorieHistoryData = calorieHistoryDataSnapshot.getValue(CalorieHistoryData::class.java)
+
+                                if (calorieHistoryData != null && calorieHistoryData.userId == userId && calorieHistoryData.date == selectedDate) {
+                                    val currentConsumed = calorieHistoryData.updatedConsumed.toDouble()
+                                    val dailyCalorie = calorieTarget
+
+                                    val newConsumed = (currentConsumed - schedulePlan.mealData.calories.toDouble()).coerceAtLeast(0.0)
+                                    val newRemaining = (dailyCalorie - newConsumed).coerceAtLeast(0.0)
+
+                                    val updateMap = mapOf(
+                                        "updatedConsumed" to String.format(Locale.ENGLISH,"%.2f", newConsumed),
+                                        "remainingCalories" to String.format(Locale.ENGLISH,"%.2f", newRemaining)
+                                    )
+                                    calRef.child(userId)
+                                        .child(selectedDate)
+                                        .updateChildren(updateMap)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+
+                })
             } else {
                 Toast.makeText(context, it.exception.toString(), Toast.LENGTH_SHORT).show()
             }

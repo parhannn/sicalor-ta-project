@@ -21,9 +21,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sicalor.adapter.MealAdapter
 import com.example.sicalor.databinding.ActivityResultBinding
 import com.example.sicalor.ui.data.BoundingBox
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.FoodData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
+import com.example.sicalor.ui.data.UserData
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -52,6 +54,7 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private lateinit var userId: String
     private lateinit var searchView: SearchView
+    private var calorieTarget: Double = 0.0
     private var allFoodList: MutableList<FoodData> = mutableListOf()
     private var currentImageUri: Uri? = null
     private var detectedFoodList: MutableList<BoundingBox> = mutableListOf()
@@ -82,6 +85,8 @@ class ResultActivity : AppCompatActivity() {
         userId = auth.currentUser!!.uid
         database = Firebase.database.reference.child("MealPlanData")
 
+        getUserData()
+
         handleUI()
         setupDatePicker()
         setupPortion()
@@ -106,12 +111,19 @@ class ResultActivity : AppCompatActivity() {
             }
 
             val database = FirebaseDatabase.getInstance().getReference("MealPlanData").child(userId)
+            val calRef =
+                FirebaseDatabase.getInstance().getReference("CalorieHistoryData").child(userId)
 
             database.get().addOnSuccessListener { snapshot ->
                 var isDuplicate = false
+                var totalConsumed = 0.0
 
                 for (mealSnapshot in snapshot.children) {
                     val meal = mealSnapshot.getValue(MealPlanData::class.java)
+
+                    if (meal?.date == selectedDate) {
+                        totalConsumed += meal.mealData?.calories?.toDoubleOrNull() ?: 0.0
+                    }
 
                     if (meal != null &&
                         meal.mealData?.name == selectedMeal!!.name &&
@@ -131,6 +143,11 @@ class ResultActivity : AppCompatActivity() {
                     ).show()
                 } else {
                     val savedMealId = generateMealId()
+
+                    val mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
+                    val updatedConsumed = totalConsumed + mealCalories
+                    val remainingCalories = calorieTarget - updatedConsumed
+
                     val mealPlanData = MealPlanData(
                         userId,
                         savedMealId,
@@ -139,11 +156,26 @@ class ResultActivity : AppCompatActivity() {
                         selectedMeal!!
                     )
 
+                    var calorieHistoryData = CalorieHistoryData(
+                        userId,
+                        selectedDate,
+                        String.format(Locale.ENGLISH,"%.2f", updatedConsumed),
+                        String.format(Locale.ENGLISH,"%.2f", remainingCalories)
+                    )
+
                     Log.d("DEBUG", "MealPlanData to be added: $mealPlanData")
 
                     database.child(savedMealId).setValue(mealPlanData)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
+                                calRef.child(selectedDate).setValue(calorieHistoryData)
+                                    .addOnCompleteListener { data ->
+                                        if (data.isSuccessful) {
+                                            Log.d("DEBUG", "MealHistoryData added successfully!")
+                                        } else {
+                                            Log.e("FirebaseError", "Error: ${data.exception?.message}")
+                                        }
+                                    }
                                 Snackbar.make(
                                     this@ResultActivity.findViewById(android.R.id.content),
                                     "Meal added successfully!",
@@ -469,6 +501,25 @@ class ResultActivity : AppCompatActivity() {
 
             override fun onCancelled(error: DatabaseError) {
                 Log.d("TAG", error.toString())
+            }
+        })
+    }
+
+    private fun getUserData() {
+        val database = Firebase.database.reference.child("UserData").child(userId)
+
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+                    val userData = userSnapshot.getValue(UserData::class.java)
+                    if (userData != null) {
+                        calorieTarget = userData.dailyCalorie.toDouble()
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@ResultActivity, error.toString(), Toast.LENGTH_SHORT).show()
             }
         })
     }

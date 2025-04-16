@@ -8,5 +8,6 @@ data class UserData(
     val height: String = "",
     val allergy: String = "",
     val activity: String = "",
-    val bmr: String = ""
+    val bmr: String = "",
+    val dailyCalorie: String = ""
 )

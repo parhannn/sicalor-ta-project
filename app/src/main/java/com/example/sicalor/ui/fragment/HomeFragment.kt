@@ -1,5 +1,6 @@
 package com.example.sicalor.ui.fragment
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -78,20 +80,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupUI() {
-        lifecycleScope.launch {
-            getUserData()
+        getUserData {
             setupSpinner()
-            delay(500)
             loadAllMealPlan(dateMealToday)
             loadMealPlan(dateMealToday)
-        }
-        setupRecyclerView()
+            setupRecyclerView()
 
-        val mainActivity = activity as MainActivity
-
-        if (!mainActivity.isClosed) {
-            infoSlideFragment = InfoSlideFragment()
-            infoSlideFragment.show(parentFragmentManager, "InfoSlideFragment")
+            val mainActivity = activity as MainActivity
+            if (!mainActivity.isClosed) {
+                if (isAdded && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    infoSlideFragment = InfoSlideFragment()
+                    infoSlideFragment.show(parentFragmentManager, "InfoSlideFragment")
+                }
+            }
         }
     }
 
@@ -117,45 +118,27 @@ class HomeFragment : Fragment() {
             }
     }
 
-    private suspend fun getUserData(){
-        val userDataDeferred = CompletableDeferred<Unit>()
-
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
+    private fun getUserData(onComplete: () -> Unit){
+        database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    for (userSnapshot in snapshot.children) {
-                        val userData = userSnapshot.getValue(UserData::class.java)
-                        if (userData != null) {
-                            val activityLevel = when (userData.activity) {
-                                "Very Low" -> 1.2
-                                "Low" -> 1.35
-                                "Medium" -> 1.5
-                                "High" -> 1.75
-                                "Very High" -> 1.9
-                                else -> 1.0
-                            }
-                            calorieTarget =
-                                userData.bmr?.toDoubleOrNull()?.times(activityLevel) ?: 0.0
-                            val formatDailyCalorie = String.format("%.2f", calorieTarget)
+                for (userSnapshot in snapshot.children) {
+                    val userData = userSnapshot.getValue(UserData::class.java)
+                    if (userData != null) {
+                        calorieTarget = userData.dailyCalorie.toDouble()
+                        val formatDailyCalorie = String.format("%.2f", calorieTarget)
 
-                            binding.tvName.text =
-                                if (!userData.name.isNullOrEmpty()) "${userData.name}!" else "!"
-                            binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
-                        }
+                        binding.tvName.text = if (!userData.name.isNullOrEmpty()) "${userData.name}!" else "!"
+                        binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
+                        onComplete()
+                        break
                     }
-                    userDataDeferred.complete(Unit)
-                } catch (e: Exception) {
-                    Log.e("FirebaseError", "Error parsing user data: ${e.message}")
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
-                userDataDeferred.complete(Unit)
             }
         })
-
-        userDataDeferred.await()
     }
 
     private fun loadMealPlan(date: String) {
@@ -245,6 +228,9 @@ class HomeFragment : Fragment() {
 
                     calorieConsumedToday = totalCalories
                     binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
+                    binding.tvCarbsConsumed.text = String.format("%.2f", totalCarbs)
+                    binding.tvFatConsumed.text = String.format("%.2f", totalFat)
+                    binding.tvProteinConsumed.text = String.format("%.2f", totalProtein)
 
                     val progress = ((calorieConsumedToday / calorieTarget) * 100).toInt()
                     binding.calorieProgressBar.progress = progress.coerceIn(0, 100)

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sicalor.R
 import com.example.sicalor.databinding.ItemMealPlanBinding
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 

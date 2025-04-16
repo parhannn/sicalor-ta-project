@@ -11,11 +11,18 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.sicalor.databinding.FragmentMealUpdateBinding
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 import com.example.sicalor.ui.data.NewMealPlanData
+import com.google.firebase.Firebase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
+import java.util.Locale
 
 class MealUpdateFragment : DialogFragment() {
     private lateinit var binding: FragmentMealUpdateBinding
@@ -23,6 +30,7 @@ class MealUpdateFragment : DialogFragment() {
     private var mealPlanData: MealPlanData? = null
     private var updatedMealPlan: NewMealPlanData = NewMealPlanData()
     private lateinit var database: DatabaseReference
+    private var calorieTarget: Double = 0.0
 
     fun setListener(listener: OnDialogSaveBtnClickListener) {
         this.listener = listener
@@ -95,14 +103,14 @@ class MealUpdateFragment : DialogFragment() {
 
             val updatedMealData = MealData(
                 mealPlanData!!.mealData.img,
-                String.format("%.2f", newCalories),
+                String.format(Locale.ENGLISH,"%.2f", newCalories),
                 mealPlanData!!.mealData.carbs,
                 mealPlanData!!.mealData.desc,
                 mealPlanData!!.mealData.fat,
                 mealPlanData!!.mealData.group,
                 mealPlanData!!.mealData.name,
                 mealPlanData!!.mealData.protein,
-                String.format("%.2f", newPortion)
+                String.format(Locale.ENGLISH,"%.2f", newPortion)
             )
 
             updatedMealPlan = NewMealPlanData(
@@ -123,6 +131,38 @@ class MealUpdateFragment : DialogFragment() {
                     Log.d(TAG, "Update sukses: $updatedMealPlan")
                     Toast.makeText(requireContext(), "Meal Updated", Toast.LENGTH_SHORT).show()
                     listener?.onUpdateMeal(updatedMealPlan)
+                    val calorieRef =
+                        FirebaseDatabase.getInstance().getReference("CalorieHistoryData")
+                            .child(mealPlanData!!.userId)
+                            .child(mealPlanData!!.date)
+
+                    val calorieDiffer = newCalories - oldCalories
+
+                    calorieRef.get().addOnSuccessListener { snapshot ->
+                        val history = snapshot.getValue(CalorieHistoryData::class.java)
+
+                        if (history != null) {
+                            val consumed = history.updatedConsumed.toDoubleOrNull() ?: 0.0
+                            val remaining = history.remainingCalories.toDoubleOrNull() ?: 0.0
+                            val updatedConsumed = consumed + calorieDiffer
+                            val updatedRemaining = remaining - calorieDiffer
+
+                            val updatedHistory = CalorieHistoryData(
+                                userId = mealPlanData!!.userId,
+                                date = mealPlanData!!.date,
+                                updatedConsumed = String.format("%.2f", updatedConsumed),
+                                remainingCalories = String.format("%.2f", updatedRemaining)
+                            )
+
+                            calorieRef.setValue(updatedHistory)
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "CalorieHistory updated successfully")
+                                }
+                                .addOnFailureListener {
+                                    Log.e(TAG, "Failed to update CalorieHistory: ${it.message}")
+                                }
+                        }
+                    }
                     dismiss()
                 }
                 .addOnFailureListener {

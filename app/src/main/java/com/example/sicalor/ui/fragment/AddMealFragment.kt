@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sicalor.adapter.MealAdapter
 import com.example.sicalor.databinding.FragmentAddMealBinding
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.FoodData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
+import com.example.sicalor.ui.data.UserData
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
@@ -55,6 +57,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
     private var currentPage = 1
     private var filteredFoodList: MutableList<FoodData> = mutableListOf()
     private var isFiltering = false
+    private var calorieTarget: Double = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,6 +73,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser!!.uid
         database = Firebase.database.reference.child("MealPlanData")
+        database = Firebase.database.reference.child("CalorieHistoryData")
         setupUI()
     }
 
@@ -92,6 +96,7 @@ class AddMealFragment : BottomSheetDialogFragment() {
             filteredFoodList.clear()
             dismiss()
         }
+        getUserData()
         setupDatePicker()
         setupSpinner()
         setupPortion()
@@ -100,20 +105,47 @@ class AddMealFragment : BottomSheetDialogFragment() {
         setupSubmitButton()
     }
 
+    private fun getUserData() {
+        val database = Firebase.database.reference.child("UserData").child(userId)
+
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+                    val userData = userSnapshot.getValue(UserData::class.java)
+                    if (userData != null) {
+                        calorieTarget = userData.dailyCalorie.toDouble()
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     private fun setupSubmitButton() {
         binding.submitPlanButton.setOnClickListener {
             if (selectedDate.isEmpty() || selectedMeal == null) {
-                Toast.makeText(requireContext(), "Please select date and meal!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please select date and meal!", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
             val database = FirebaseDatabase.getInstance().getReference("MealPlanData").child(userId)
+            val calRef =
+                FirebaseDatabase.getInstance().getReference("CalorieHistoryData").child(userId)
 
             database.get().addOnSuccessListener { snapshot ->
                 var isDuplicate = false
+                var totalConsumed = 0.0
 
                 for (mealSnapshot in snapshot.children) {
                     val meal = mealSnapshot.getValue(MealPlanData::class.java)
+
+                    if (meal?.date == selectedDate) {
+                        totalConsumed += meal.mealData?.calories?.toDoubleOrNull() ?: 0.0
+                    }
 
                     if (meal != null &&
                         meal.mealData?.name == selectedMeal!!.name &&
@@ -126,9 +158,18 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 }
 
                 if (isDuplicate) {
-                    Toast.makeText(requireContext(), "Meal with the same name, date, and type already exists!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Meal with the same name, date, and type already exists!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     val savedMealId = generateMealId()
+
+                    val mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
+                    val updatedConsumed = totalConsumed + mealCalories
+                    val remainingCalories = calorieTarget - updatedConsumed
+
                     var mealPlanData = MealPlanData(
                         userId,
                         savedMealId,
@@ -137,12 +178,31 @@ class AddMealFragment : BottomSheetDialogFragment() {
                         selectedMeal!!
                     )
 
+                    var calorieHistoryData = CalorieHistoryData(
+                        userId,
+                        selectedDate,
+                        String.format(Locale.ENGLISH,"%.2f", updatedConsumed),
+                        String.format(Locale.ENGLISH,"%.2f", remainingCalories)
+                    )
+
                     Log.d("DEBUG", "MealPlanData to be added: $mealPlanData")
 
                     database.child(savedMealId).setValue(mealPlanData)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
-                                Snackbar.make(requireActivity().findViewById(android.R.id.content), "Meal added successfully!", Snackbar.LENGTH_SHORT)
+                                calRef.child(selectedDate).setValue(calorieHistoryData)
+                                    .addOnCompleteListener { data ->
+                                        if (data.isSuccessful) {
+                                            Log.d("DEBUG", "MealHistoryData added successfully!")
+                                        } else {
+                                            Log.e("FirebaseError", "Error: ${data.exception?.message}")
+                                        }
+                                    }
+                                Snackbar.make(
+                                    requireActivity().findViewById(android.R.id.content),
+                                    "Meal added successfully!",
+                                    Snackbar.LENGTH_SHORT
+                                )
                                     .show()
                                 allFoodList.clear()
                                 filteredFoodList.clear()
@@ -155,13 +215,18 @@ class AddMealFragment : BottomSheetDialogFragment() {
                                 dismiss()
                             } else {
                                 Log.e("FirebaseError", "Error: ${it.exception?.message}")
-                                Toast.makeText(requireContext(), "Failed to add meal", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Failed to add meal",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                 }
             }.addOnFailureListener {
                 Log.e("FirebaseError", "Error: ${it.message}")
-                Toast.makeText(requireContext(), "Error checking meal plan", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error checking meal plan", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -193,15 +258,18 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 }
                 val portionValue = portionText.toDouble()
                 val newCalorie = (portionValue * data.calories.toDouble()) / data.portion.toDouble()
+                val newCarb = (portionValue * data.carbs.toDouble()) / data.portion.toDouble()
+                val newProtein = (portionValue * data.protein.toDouble()) / data.portion.toDouble()
+                val newFat = (portionValue * data.fat.toDouble()) / data.portion.toDouble()
 
                 selectedMeal = MealData(
-                    calories = String.format(Locale.ENGLISH,"%.2f", newCalorie),
+                    calories = String.format(Locale.ENGLISH, "%.2f", newCalorie),
                     name = data.name,
                     group = data.group,
                     desc = data.desc,
-                    protein = data.protein,
-                    carbs = data.carbs,
-                    fat = data.fat,
+                    protein = String.format(Locale.ENGLISH, "%.2f", newProtein),
+                    carbs = String.format(Locale.ENGLISH, "%.2f", newCarb),
+                    fat = String.format(Locale.ENGLISH, "%.2f", newFat),
                     portion = portionText,
                     img = data.img
                 )
@@ -243,7 +311,8 @@ class AddMealFragment : BottomSheetDialogFragment() {
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { selection ->
-                selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(selection))
+                selectedDate =
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(selection))
                 binding.selectedDate.text = selectedDate
                 Log.d("DEBUG", "Selected Date: $selectedDate")
             }
@@ -257,7 +326,8 @@ class AddMealFragment : BottomSheetDialogFragment() {
             adapter.updateData(allFoodList.take(itemsPerPage))
         } else {
             isFiltering = true
-            filteredFoodList = allFoodList.filter { it.name.contains(query, ignoreCase = true) }.toMutableList()
+            filteredFoodList =
+                allFoodList.filter { it.name.contains(query, ignoreCase = true) }.toMutableList()
             currentPage = 1
             adapter.updateData(filteredFoodList.take(itemsPerPage))
         }

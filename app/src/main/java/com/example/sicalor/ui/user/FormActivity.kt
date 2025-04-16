@@ -29,8 +29,6 @@ class FormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFormBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         supportActionBar?.hide()
@@ -42,6 +40,9 @@ class FormActivity : AppCompatActivity() {
         activityLevelList = resources.getStringArray(R.array.activity_level)
 
         getUserData()
+
+        binding = ActivityFormBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         binding.activitySpinner.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, activityLevelList)
         binding.saveSubmit.setOnClickListener { initData() }
@@ -132,9 +133,19 @@ class FormActivity : AppCompatActivity() {
             isValid = false
         }
 
+        val activityLevel = when (activity) {
+            "Very Low" -> 1.2
+            "Low" -> 1.35
+            "Medium" -> 1.5
+            "High" -> 1.75
+            "Very High" -> 1.9
+            else -> 1.0
+        }
+
         if (isValid) {
             val bmr = calculateBMR(gender, weight.toDouble(), height.toDouble(), age.toInt()).toString()
-            saveData(name, gender, age, weight, height, allergy, activity, bmr)
+            val dailyCalorie = calculateDailyCalorie(bmr.toDouble(), activityLevel).toString()
+            saveData(name, gender, age, weight, height, allergy, activity, bmr, dailyCalorie)
         }
     }
 
@@ -146,6 +157,10 @@ class FormActivity : AppCompatActivity() {
         }
     }
 
+    private fun calculateDailyCalorie(bmr: Double, activityLevel: Double): Double {
+        return bmr * activityLevel
+    }
+
     private fun saveData(
         name: String,
         gender: String,
@@ -154,7 +169,8 @@ class FormActivity : AppCompatActivity() {
         height: String,
         allergy: String,
         activity: String,
-        bmr: String
+        bmr: String,
+        dailyCalorie: String
     ) {
         val userData = UserData(
             name,
@@ -164,7 +180,8 @@ class FormActivity : AppCompatActivity() {
             height,
             allergy,
             activity,
-            bmr
+            bmr,
+            dailyCalorie
         )
 
         if (isNotNull) {
