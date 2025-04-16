@@ -71,7 +71,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
 
     override fun onDestroy() {
         super.onDestroy()
-        allPlanList!!.clear()
+        allPlanList?.clear()
     }
 
     private fun setupUI() {

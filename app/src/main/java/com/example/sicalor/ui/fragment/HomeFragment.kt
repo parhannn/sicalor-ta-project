@@ -1,6 +1,5 @@
 package com.example.sicalor.ui.fragment
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -16,13 +15,13 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sicalor.R
 import com.example.sicalor.adapter.TodayPlanAdapter
 import com.example.sicalor.databinding.FragmentHomeBinding
 import com.example.sicalor.ui.MainActivity
+import com.example.sicalor.ui.data.CalorieHistoryData
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 import com.example.sicalor.ui.data.UserData
@@ -33,9 +32,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -166,9 +162,11 @@ class HomeFragment : Fragment() {
                     allPlanList = mealPlanDataList
 
                     if (allPlanList!!.isNotEmpty()) {
+                        loadCalorieHistory(date)
                         binding.noDataFoundPlaceholder.visibility = View.GONE
                         adapter.updateData(mealPlanDataList, mealDataList)
                     } else {
+                        loadCalorieHistory(date)
                         binding.noDataFoundPlaceholder.visibility = View.VISIBLE
                         adapter.updateData(emptyList(), emptyList())
                     }
@@ -245,6 +243,32 @@ class HomeFragment : Fragment() {
                     }
                 } else {
                     Log.d("DEBUG", "No data available")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", "Error: ${error.message}")
+            }
+        })
+    }
+
+    private fun loadCalorieHistory(date: String) {
+        val calorieRef = Firebase.database.reference
+            .child("CalorieHistoryData")
+            .child(userId)
+            .child(date)
+
+        calorieRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val calorieHistoryData = snapshot.getValue(CalorieHistoryData::class.java)
+                    if (calorieHistoryData != null) {
+                        binding.tvCalorieConsumedCount.text = calorieHistoryData.updatedConsumed
+                        binding.tvCalorieRemainingCount.text = calorieHistoryData.remainingCalories
+                    }
+                } else {
+                    binding.tvCalorieConsumed.text = "0.00"
+                    binding.tvCalorieRemainingCount.text = "0.00"
                 }
             }
 

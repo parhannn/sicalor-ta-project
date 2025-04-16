@@ -34,7 +34,7 @@ class FoodFragment : Fragment() {
     private var _binding: FragmentFoodBinding? = null
     private val binding get() = _binding!!
     private var isLoading = false
-    private val itemsPerPage = 5
+    private val itemsPerPage = 10
     private var currentPage = 1
 
     override fun onCreateView(
