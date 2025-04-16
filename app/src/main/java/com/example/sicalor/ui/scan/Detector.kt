@@ -127,12 +127,12 @@ class Detector (
         return when (rawLabel.lowercase()) {
             "nasi_putih" -> "Nasi Putih"
             "jagung_rebus" -> "Jagung Rebus"
-            "ayam_goreng_paha", "paha_ayam_goreng" -> "Paha Ayam Goreng"
+            "ayam_goreng_paha", "paha_ayam_goreng" -> "Paha Ayam Goreng tanpa Pelapis (Kulit Dimakan)"
             "telur_ayam_rebus" -> "Telur Rebus"
             "tempe_goreng" -> "Tempe Goreng"
             "tahu_goreng" -> "Tahu Goreng"
             "tumis_kangkung" -> "Tumis Kangkung"
-            "bening_bayam" -> "Bening Bayam"
+            "bening_bayam" -> "Sayur Bening Bayam"
             "buah_pisang", "pisang" -> "Pisang"
             "buah_jeruk", "jeruk" -> "Jeruk"
             else -> {

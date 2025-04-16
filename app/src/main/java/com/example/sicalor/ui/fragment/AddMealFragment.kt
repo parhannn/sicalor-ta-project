@@ -166,9 +166,9 @@ class AddMealFragment : BottomSheetDialogFragment() {
                 } else {
                     val savedMealId = generateMealId()
 
-                    val mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
-                    val updatedConsumed = totalConsumed + mealCalories
-                    val remainingCalories = calorieTarget - updatedConsumed
+                    var mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
+                    var updatedConsumed = totalConsumed + mealCalories
+                    var remainingCalories = calorieTarget - updatedConsumed
 
                     var mealPlanData = MealPlanData(
                         userId,
@@ -194,6 +194,10 @@ class AddMealFragment : BottomSheetDialogFragment() {
                                     .addOnCompleteListener { data ->
                                         if (data.isSuccessful) {
                                             Log.d("DEBUG", "MealHistoryData added successfully!")
+                                            userId = ""
+                                            selectedDate = ""
+                                            updatedConsumed = 0.0
+                                            remainingCalories = 0.0
                                         } else {
                                             Log.e("FirebaseError", "Error: ${data.exception?.message}")
                                         }

@@ -61,6 +61,7 @@ class ResultActivity : AppCompatActivity() {
     private var currentImageBitmap: Bitmap? = null
     private var currentPage = 1
     private var fullFoodList: MutableList<FoodData> = mutableListOf()
+    private var calorieHistoryData: MutableList<CalorieHistoryData> = mutableListOf()
     private var isLoading = false
     private var selectedMeal: MealData? = null
     private val itemsPerPage = 5
@@ -144,9 +145,9 @@ class ResultActivity : AppCompatActivity() {
                 } else {
                     val savedMealId = generateMealId()
 
-                    val mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
-                    val updatedConsumed = totalConsumed + mealCalories
-                    val remainingCalories = calorieTarget - updatedConsumed
+                    var mealCalories = selectedMeal!!.calories.toDoubleOrNull() ?: 0.0
+                    var updatedConsumed = totalConsumed + mealCalories
+                    var remainingCalories = calorieTarget - updatedConsumed
 
                     val mealPlanData = MealPlanData(
                         userId,
@@ -156,7 +157,7 @@ class ResultActivity : AppCompatActivity() {
                         selectedMeal!!
                     )
 
-                    var calorieHistoryData = CalorieHistoryData(
+                    val calorieHistoryData = CalorieHistoryData(
                         userId,
                         selectedDate,
                         String.format(Locale.ENGLISH,"%.2f", updatedConsumed),
@@ -172,6 +173,10 @@ class ResultActivity : AppCompatActivity() {
                                     .addOnCompleteListener { data ->
                                         if (data.isSuccessful) {
                                             Log.d("DEBUG", "MealHistoryData added successfully!")
+                                            userId = ""
+                                            selectedDate = ""
+                                            updatedConsumed = 0.0
+                                            remainingCalories = 0.0
                                         } else {
                                             Log.e("FirebaseError", "Error: ${data.exception?.message}")
                                         }
@@ -271,25 +276,18 @@ class ResultActivity : AppCompatActivity() {
     private fun fetchFoodFromDatabase(detectedNames: List<String>) {
         database = FirebaseDatabase.getInstance().reference.child("Food")
 
-        val normalizedDetectedNames = detectedNames.map { it.lowercase() }
+        val normalizedDetectedNames = detectedNames.map { it.lowercase().trim() }
 
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val detectedList = mutableListOf<FoodData>()
-                val allOtherFoods = mutableListOf<FoodData>()
 
                 for (data in snapshot.children) {
                     val food = data.getValue(FoodData::class.java)
                     if (food != null) {
-                        val normalizedFoodName = food.name.lowercase()
-                        if (normalizedDetectedNames.any {
-                                normalizedFoodName.contains(it) || it.contains(
-                                    normalizedFoodName
-                                )
-                            }) {
+                        val normalizedFoodName = food.name.lowercase().trim()
+                        if (normalizedDetectedNames.contains(normalizedFoodName)) {
                             detectedList.add(food)
-                        } else {
-                            allOtherFoods.add(food)
                         }
                     }
                 }
