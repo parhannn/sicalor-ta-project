@@ -147,8 +147,8 @@
                     android:id="@+id/calorie_reach_indicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="12dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/poppins_bold"
                     android:text="You have reach daily calorie target!"
                     android:textColor="@color/colorPrimary"
@@ -211,6 +211,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <ScrollView
+            android:id="@+id/rv_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -232,7 +233,20 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/item_today_plan" />
+                    tools:listitem="@layout/item_today_plan"
+                    tools:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/no_data_found_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    android:src="@drawable/no_data_placeholder"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

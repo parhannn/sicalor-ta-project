@@ -165,6 +165,7 @@ class HomeFragment : Fragment() {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
+                    binding.noDataFoundPlaceholder.visibility = View.GONE
                     val mealPlanDataList = mutableListOf<MealPlanData>()
                     val mealDataList = mutableListOf<MealData>()
 
@@ -180,7 +181,15 @@ class HomeFragment : Fragment() {
                     }
 
                     allPlanList = mealPlanDataList
-                    adapter.updateData(mealPlanDataList, mealDataList)
+
+                    if (allPlanList!!.isNotEmpty()) {
+                        binding.noDataFoundPlaceholder.visibility = View.GONE
+                        adapter.updateData(mealPlanDataList, mealDataList)
+                    } else {
+                        binding.noDataFoundPlaceholder.visibility = View.VISIBLE
+                        adapter.updateData(emptyList(), emptyList())
+                    }
+
                 } else {
                     Log.d("DEBUG", "No data available")
                 }
@@ -200,6 +209,15 @@ class HomeFragment : Fragment() {
                     val mealPlanDataList = mutableListOf<MealPlanData>()
                     val mealDataList = mutableListOf<MealData>()
                     var totalCalories = 0.0
+                    var totalCarbs = 0.0
+                    var totalFat = 0.0
+                    var totalProtein = 0.0
+                    var groupOne = 0
+                    var groupTwo = 0
+                    var groupThree = 0
+                    var groupFour = 0
+                    var groupFive = 0
+                    var groupSix = 0
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
@@ -209,6 +227,18 @@ class HomeFragment : Fragment() {
                                 mealPlanDataList.add(mealPlanData)
                                 mealDataList.add(mealPlanData.mealData)
                                 totalCalories += mealPlanData.mealData.calories.toDouble()
+                                totalCarbs += mealPlanData.mealData.carbs.toDouble()
+                                totalFat += mealPlanData.mealData.fat.toDouble()
+                                totalProtein += mealPlanData.mealData.protein.toDouble()
+
+                                when (mealPlanData.mealData.group) {
+                                    "Golongan 1" -> groupOne++
+                                    "Golongan 2" -> groupTwo++
+                                    "Golongan 3" -> groupThree++
+                                    "Golongan 4" -> groupFour++
+                                    "Golongan 5" -> groupFive++
+                                    "Golongan 6" -> groupSix++
+                                }
                             }
                         }
                     }

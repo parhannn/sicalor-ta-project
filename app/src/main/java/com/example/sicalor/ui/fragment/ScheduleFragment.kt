@@ -48,7 +48,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).toString()
     private var selectedDate: String = ""
     private var selectedPlanType: String = "Breakfast"
-    private var allPlanList: MutableList<MealPlanData> = mutableListOf()
+    private var allPlanList: MutableList<MealPlanData>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,7 +68,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
 
     override fun onDestroy() {
         super.onDestroy()
-        allPlanList.clear()
+        allPlanList!!.clear()
     }
 
     private fun setupUI() {
@@ -134,7 +134,14 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
                         }
                     }
                     allPlanList = mealPlanDataList
-                    adapter.updateData(mealPlanDataList, mealDataList)
+
+                    if (allPlanList!!.isNotEmpty()) {
+                        binding.noDataFoundPlaceholder.visibility = View.GONE
+                        adapter.updateData(mealPlanDataList, mealDataList)
+                    } else {
+                        binding.noDataFoundPlaceholder.visibility = View.VISIBLE
+                        adapter.updateData(emptyList(), emptyList())
+                    }
                 } else {
                     Log.d("DEBUG", "No data available")
                 }
