@@ -22,4 +22,16 @@
     <string name="notification_title">SiCalor</string>
     <string name="notification_message">Kalorimu hari ini sudah terpenuhi!</string>
     <string name="notification_subtext">Reminder</string>
+
+    <string name="dialog_title_1">Mengapa Kalori Itu Penting?</string>
+    <string name="dialog_desc_1">Kalori adalah satuan energi yang dibutuhkan tubuh untuk berfungsi. Jumlah kalori yang kamu konsumsi memengaruhi berat badan, energi harian, dan kesehatan secara keseluruhan. Mengetahui kebutuhan kalori membantu kamu menjaga keseimbangan antara asupan dan aktivitas.</string>
+    
+    <string name="dialog_title_2">Faktor-Faktor Penentu Kebutuhan Kalori</string>
+    <string name="dialog_desc_2">Perhitungan kalori didasarkan pada tinggi badan, berat badan, usia, dan tingkat aktivitas harianmu. Semua faktor ini mempengaruhi berapa banyak energi yang dibutuhkan tubuh untuk bekerja secara optimal. Data ini digunakan untuk menghitung BMR dan Total Energy Expenditure (TEE).</string>
+
+    <string name="dialog_title_3">Pentingnya Pola Makan Sehat</string>
+    <string name="dialog_desc_3">Pola makan sehat tidak hanya soal jumlah kalori, tapi juga kualitas nutrisi. Kombinasi yang tepat antara karbohidrat, protein, lemak, vitamin, dan mineral sangat penting untuk menjaga kesehatan, daya tahan tubuh, dan mencegah berbagai penyakit kronis.</string>
+
+    <string name="dialog_title_4">Mulai Langkah Sehatmu Hari Ini</string>
+    <string name="dialog_desc_4">Yuk, mulai perjalananmu menuju hidup sehat! Dengan mengetahui kebutuhan kalori dan menjaga pola makan yang tepat, kamu bisa mencapai gaya hidup yang seimbang, penuh energi, dan lebih produktif setiap hari.</string>
 </resources>

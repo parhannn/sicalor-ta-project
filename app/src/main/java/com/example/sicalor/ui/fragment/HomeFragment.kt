@@ -44,6 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var userId: String
     private lateinit var adapter: TodayPlanAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var infoSlideFragment: InfoSlideFragment
     private var _binding: FragmentHomeBinding? = null
     private var calorieTarget: Double = 0.0
     private var calorieConsumedToday: Double = 0.0
@@ -85,6 +86,13 @@ class HomeFragment : Fragment() {
             loadMealPlan(dateMealToday)
         }
         setupRecyclerView()
+
+        val mainActivity = activity as MainActivity
+
+        if (!mainActivity.isClosed) {
+            infoSlideFragment = InfoSlideFragment()
+            infoSlideFragment.show(parentFragmentManager, "InfoSlideFragment")
+        }
     }
 
     private fun setupSpinner() {

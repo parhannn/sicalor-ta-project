@@ -19,6 +19,8 @@ import com.example.sicalor.databinding.FragmentScheduleBinding
 import com.example.sicalor.ui.data.MealData
 import com.example.sicalor.ui.data.MealPlanData
 import com.example.sicalor.ui.data.NewMealPlanData
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -153,9 +155,16 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
 
     private fun setupDatePicker() {
         binding.selectDate.setOnClickListener {
+            val today = MaterialDatePicker.todayInUtcMilliseconds()
+
+            val constraints = CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointBackward.before(today))
+                .build()
+
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Meal Plan Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setSelection(today)
+                .setCalendarConstraints(constraints)
                 .build()
 
             datePicker.show(parentFragmentManager, "DATE_PICKER")

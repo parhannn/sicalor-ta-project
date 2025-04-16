@@ -73,17 +73,6 @@
         app:useCompatPadding="true" />
 
     <ImageView
-        android:id="@+id/open_gallery"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginEnd="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/capture_image"
-        app:layout_constraintEnd_toStartOf="@+id/capture_image"
-        app:layout_constraintTop_toTopOf="@+id/capture_image"
-        app:srcCompat="@drawable/ic_gallery"
-        app:tint="@color/colorPrimary" />
-
-    <ImageView
         android:id="@+id/switch_camera"
         android:layout_width="45dp"
         android:layout_height="45dp"

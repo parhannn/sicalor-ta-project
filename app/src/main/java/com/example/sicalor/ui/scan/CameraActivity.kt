@@ -102,7 +102,6 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
             startCamera()
         }
         binding.captureImage.setOnClickListener { captureImage() }
-        binding.openGallery.setOnClickListener {  }
         binding.backButton.setOnClickListener { finish() }
     }
 
