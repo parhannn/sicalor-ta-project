@@ -52,6 +52,8 @@ class HomeFragment : Fragment() {
         Date()
     ).toString()
     private var allPlanList: MutableList<MealPlanData>? = null
+    private var carbsNeedGrams: Double = 0.0
+    private var proteinNeedGrams: Double = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -125,6 +127,7 @@ class HomeFragment : Fragment() {
 
                         binding.tvName.text = if (!userData.name.isNullOrEmpty()) "${userData.name}!" else "!"
                         binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
+
                         onComplete()
                         break
                     }
@@ -199,6 +202,10 @@ class HomeFragment : Fragment() {
                     var groupFour = 0
                     var groupFive = 0
                     var groupSix = 0
+                    carbsNeedGrams = (calorieTarget * 0.55) /4
+                    proteinNeedGrams = (calorieTarget * 0.15) / 4
+                    Log.d("DEBUG", "carbsNeedGrams: $carbsNeedGrams")
+                    Log.d("DEBUG", "proteinNeedGrams: $proteinNeedGrams")
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
@@ -241,6 +248,14 @@ class HomeFragment : Fragment() {
                     if (calorieConsumedToday > calorieTarget) {
                         binding.calorieReachIndicator.visibility = View.VISIBLE
                     }
+
+                    updateNutrientIndicators(
+                        groupFour,
+                        totalCarbs,
+                        totalProtein,
+                        carbsNeedGrams,
+                        proteinNeedGrams
+                    )
                 } else {
                     Log.d("DEBUG", "No data available")
                 }
@@ -250,6 +265,28 @@ class HomeFragment : Fragment() {
                 Log.e("FirebaseError", "Error: ${error.message}")
             }
         })
+    }
+
+    private fun updateNutrientIndicators(
+        groupFour: Int,
+        currentCarbs: Double,
+        currentProtein: Double,
+        carbsNeedGrams: Double,
+        proteinNeedGrams: Double
+    ) {
+        binding.needCarbsIndicator.visibility = View.GONE
+        binding.needProteinIndicator.visibility = View.GONE
+        binding.needFiberIndicator.visibility = View.GONE
+
+        if (groupFour == 0) {
+            binding.needFiberIndicator.visibility = View.VISIBLE
+        }
+        if (currentProtein < proteinNeedGrams) {
+            binding.needProteinIndicator.visibility = View.VISIBLE
+        }
+        if (currentCarbs < carbsNeedGrams) {
+            binding.needCarbsIndicator.visibility = View.VISIBLE
+        }
     }
 
     private fun loadCalorieHistory(date: String) {
