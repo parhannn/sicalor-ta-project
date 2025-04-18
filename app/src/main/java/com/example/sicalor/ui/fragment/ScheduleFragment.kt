@@ -276,7 +276,7 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+                        Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
                     }
 
                 })

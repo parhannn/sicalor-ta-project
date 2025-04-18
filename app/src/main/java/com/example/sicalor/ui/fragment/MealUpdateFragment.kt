@@ -150,8 +150,8 @@ class MealUpdateFragment : DialogFragment() {
                             val updatedHistory = CalorieHistoryData(
                                 userId = mealPlanData!!.userId,
                                 date = mealPlanData!!.date,
-                                updatedConsumed = String.format("%.2f", updatedConsumed),
-                                remainingCalories = String.format("%.2f", updatedRemaining)
+                                updatedConsumed = String.format(Locale.ENGLISH, "%.2f", updatedConsumed),
+                                remainingCalories = String.format(Locale.ENGLISH, "%.2f", updatedRemaining)
                             )
 
                             calorieRef.setValue(updatedHistory)
