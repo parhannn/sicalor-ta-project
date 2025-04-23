@@ -61,7 +61,6 @@ class ResultActivity : AppCompatActivity() {
     private var currentImageBitmap: Bitmap? = null
     private var currentPage = 1
     private var fullFoodList: MutableList<FoodData> = mutableListOf()
-    private var calorieHistoryData: MutableList<CalorieHistoryData> = mutableListOf()
     private var isLoading = false
     private var selectedMeal: MealData? = null
     private val itemsPerPage = 5

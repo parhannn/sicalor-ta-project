@@ -102,7 +102,11 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
             startCamera()
         }
         binding.captureImage.setOnClickListener { captureImage() }
-        binding.backButton.setOnClickListener { finish() }
+        binding.backButton.setOnClickListener {
+            cameraProvider?.unbindAll()
+            imageAnalyzer?.clearAnalyzer()
+            finish()
+        }
     }
 
     override fun onStart() {
@@ -232,9 +236,9 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         cameraProvider?.unbindAll()
         imageAnalyzer?.clearAnalyzer()
+        super.onDestroy()
     }
 
     override fun onEmptyDetect() {

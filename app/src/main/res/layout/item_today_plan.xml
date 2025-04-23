@@ -36,10 +36,10 @@
                 android:layout_marginTop="6dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/poppins_bold"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="Food Name"
                 android:textColor="@color/colorGrayDark"
-                android:textSize="14sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="100 kcal"
                 android:textColor="@color/colorGrayDark"
-                android:textSize="10sp" />
+                android:textSize="8sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -65,7 +65,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:text="100 g"
                     android:textColor="@color/colorGrayDark"
-                    android:textSize="10sp" />
+                    android:textSize="8sp" />
 
                 <TextView
                     android:id="@+id/food_type"
@@ -76,7 +76,7 @@
                     android:fontFamily="@font/poppins_bold"
                     android:text="Breakfast"
                     android:textColor="@color/colorGrayDark"
-                    android:textSize="10sp" />
+                    android:textSize="8sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -54,6 +54,7 @@ class HomeFragment : Fragment() {
     private var allPlanList: MutableList<MealPlanData>? = null
     private var carbsNeedGrams: Double = 0.0
     private var proteinNeedGrams: Double = 0.0
+    private var fatNeedGrams: Double = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,7 +127,7 @@ class HomeFragment : Fragment() {
                         val formatDailyCalorie = String.format("%.2f", calorieTarget)
 
                         binding.tvName.text = if (!userData.name.isNullOrEmpty()) "${userData.name}!" else "!"
-                        binding.tvDailyCalorie.text = "${formatDailyCalorie} kcal"
+                        binding.tvDailyCalorie.text = "$formatDailyCalorie kcal"
 
                         onComplete()
                         break
@@ -202,10 +203,9 @@ class HomeFragment : Fragment() {
                     var groupFour = 0
                     var groupFive = 0
                     var groupSix = 0
-                    carbsNeedGrams = (calorieTarget * 0.55) /4
-                    proteinNeedGrams = (calorieTarget * 0.15) / 4
-                    Log.d("DEBUG", "carbsNeedGrams: $carbsNeedGrams")
-                    Log.d("DEBUG", "proteinNeedGrams: $proteinNeedGrams")
+                    carbsNeedGrams = (calorieTarget * 0.55)
+                    proteinNeedGrams = (calorieTarget * 0.15)
+                    fatNeedGrams = (calorieTarget * 0.25)
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
@@ -232,13 +232,25 @@ class HomeFragment : Fragment() {
                     }
 
                     calorieConsumedToday = totalCalories
+
+                    val formatDailyCarbs = String.format("%.2f", totalCarbs)
+                    val formatDailyFat = String.format("%.2f", totalFat)
+                    val formatDailyProtein = String.format("%.2f", totalProtein)
+
                     binding.tvCalorieConsumed.text = String.format("%.2f", totalCalories)
-                    binding.tvCarbsConsumed.text = String.format("%.2f", totalCarbs)
-                    binding.tvFatConsumed.text = String.format("%.2f", totalFat)
-                    binding.tvProteinConsumed.text = String.format("%.2f", totalProtein)
+                    binding.tvCarbsConsumed.text = "$formatDailyCarbs g"
+                    binding.tvFatConsumed.text = "$formatDailyFat g"
+                    binding.tvProteinConsumed.text = "$formatDailyProtein g"
 
                     val progress = ((calorieConsumedToday / calorieTarget) * 100).toInt()
+                    val carbsProgress = ((totalCarbs / carbsNeedGrams) * 100).toInt()
+                    val fatProgress = ((totalFat / fatNeedGrams) * 100).toInt()
+                    val proteinProgress = ((totalProtein / proteinNeedGrams) * 100).toInt()
+
                     binding.calorieProgressBar.progress = progress.coerceIn(0, 100)
+                    binding.carbsProgressBar.progress = carbsProgress.coerceIn(0, 100)
+                    binding.fatProgressBar.progress = fatProgress.coerceIn(0, 100)
+                    binding.proteinProgressBar.progress = proteinProgress
 
                     val mainActivity = requireActivity() as MainActivity
                     if (calorieConsumedToday > calorieTarget && !mainActivity.isGained) {

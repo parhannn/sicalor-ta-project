@@ -36,10 +36,10 @@
                 android:layout_marginTop="6dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/poppins_bold"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="Food Name"
                 android:textColor="@color/colorGrayDark"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Golongan 1"
                 android:textColor="@color/colorGrayDark"
-                android:textSize="10sp" />
+                android:textSize="8sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
