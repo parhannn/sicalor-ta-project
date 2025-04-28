@@ -19,7 +19,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
-        app:scaleType="fillStart" />
+        app:scaleType="fillStart">
+
+        <com.example.sicalor.ui.customview.OverlayView
+            android:id="@+id/overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:translationZ="5dp" />
+    </androidx.camera.view.PreviewView>
 
     <TextView
         android:id="@+id/inferenceTime"
@@ -30,19 +37,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="100ms" />
-
-    <com.example.sicalor.ui.customview.OverlayView
-        android:id="@+id/overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:translationZ="5dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="3:4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
 
     <ImageView
         android:id="@+id/back_button"
@@ -71,6 +65,68 @@
         app:srcCompat="@drawable/ic_capture_big"
         app:tint="@color/colorPrimarySoft"
         app:useCompatPadding="true" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tutorial_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:background="@color/colorPrimary"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toTopOf="@id/capture_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_ic"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_healthy_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/gradient_separator"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_separator"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_content"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:fontFamily="@font/poppins_bold"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="Ingin tahu cara memindai?"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/flash_toggle"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintBottom_toBottomOf="@id/capture_image"
+        app:layout_constraintEnd_toStartOf="@id/capture_image"
+        app:layout_constraintTop_toTopOf="@id/capture_image"
+        app:srcCompat="@drawable/ic_flash_off"
+        app:tint="@color/colorPrimary" />
 
     <ImageView
         android:id="@+id/switch_camera"

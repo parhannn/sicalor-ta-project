@@ -12,10 +12,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.OrientationEventListener
 import android.view.Surface
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
@@ -27,8 +26,10 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.sicalor.R
 import com.example.sicalor.databinding.ActivityCameraBinding
 import com.example.sicalor.ui.data.BoundingBox
+import com.example.sicalor.ui.fragment.InfoScanFragment
 import com.example.sicalor.ui.scan.Constants.LABELS_PATH
 import com.example.sicalor.ui.scan.Constants.MODEL_PATH
 import com.example.sicalor.utils.createCustomTempFile
@@ -49,6 +50,7 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
     private var lastDetection: List<BoundingBox>? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private val isFrontCamera = false
+    private var isFlashOn = false
     private val orientationEventListener by lazy {
         object : OrientationEventListener(this) {
             override fun onOrientationChanged(orientation: Int) {
@@ -97,15 +99,42 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
 
         binding.switchCamera.setOnClickListener {
             cameraSelector =
-                if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) CameraSelector.DEFAULT_BACK_CAMERA
-                else CameraSelector.DEFAULT_FRONT_CAMERA
+                if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) CameraSelector.DEFAULT_FRONT_CAMERA
+                else CameraSelector.DEFAULT_BACK_CAMERA
+
+            if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                binding.flashToggle.visibility = View.VISIBLE
+            } else {
+                binding.flashToggle.visibility = View.GONE
+            }
+
             startCamera()
         }
+
         binding.captureImage.setOnClickListener { captureImage() }
+        binding.flashToggle.setOnClickListener { toggleFlash() }
+        binding.tutorialBtn.setOnClickListener { showInfoScan() }
         binding.backButton.setOnClickListener {
             cameraProvider?.unbindAll()
             imageAnalyzer?.clearAnalyzer()
             finish()
+        }
+    }
+
+    private fun showInfoScan() {
+        val sheetDialog = InfoScanFragment()
+
+        sheetDialog.show(supportFragmentManager, "Info Scan Fragment")
+    }
+
+    private fun toggleFlash() {
+        camera?.cameraControl?.enableTorch(!isFlashOn)
+        isFlashOn = !isFlashOn
+
+        if (isFlashOn) {
+            binding.flashToggle.setImageResource(R.drawable.ic_flash_on)
+        } else {
+            binding.flashToggle.setImageResource(R.drawable.ic_flash_off)
         }
     }
 

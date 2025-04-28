@@ -25,7 +25,7 @@
 
     <string name="dialog_title_1">Mengapa Kalori Itu Penting?</string>
     <string name="dialog_desc_1">Kalori adalah satuan energi yang dibutuhkan tubuh untuk berfungsi. Jumlah kalori yang kamu konsumsi memengaruhi berat badan, energi harian, dan kesehatan secara keseluruhan. Mengetahui kebutuhan kalori membantu kamu menjaga keseimbangan antara asupan dan aktivitas.</string>
-    
+
     <string name="dialog_title_2">Faktor-Faktor Penentu Kebutuhan Kalori</string>
     <string name="dialog_desc_2">Perhitungan kalori didasarkan pada tinggi badan, berat badan, usia, dan tingkat aktivitas harianmu. Semua faktor ini mempengaruhi berapa banyak energi yang dibutuhkan tubuh untuk bekerja secara optimal. Data ini digunakan untuk menghitung BMR dan Total Energy Expenditure (TEE).</string>
 
@@ -34,4 +34,27 @@
 
     <string name="dialog_title_4">Mulai Langkah Sehatmu Hari Ini</string>
     <string name="dialog_desc_4">Yuk, mulai perjalananmu menuju hidup sehat! Dengan mengetahui kebutuhan kalori dan menjaga pola makan yang tepat, kamu bisa mencapai gaya hidup yang seimbang, penuh energi, dan lebih produktif setiap hari.</string>
+
+    <string name="content_title_1">✅ 1. Pastikan Makanan Terlihat Jelas</string>
+    <string name="content_title_2">✅ 2. Gunakan Pencahayaan yang Cukup</string>
+    <string name="content_title_3">✅ 3. Jarak Ideal Pemotretan</string>
+    <string name="content_title_4">✅ 4. Fokuskan Kamera</string>
+    <string name="content_title_5">✅ 5. Perlu Diketahui</string>
+
+    <string name="content_desc_1">Hindari piring yang terlalu ramai. Usahakan makanan utama yang ingin dipindai berada di tengah dan terlihat utuh.</string>
+    <string name="content_desc_2">Scan di tempat terang. Hindari bayangan atau kondisi gelap karena dapat mengurangi akurasi pemindaian.</string>
+    <string name="content_desc_3">Pegang kamera sekitar 20–30 cm dari makanan. Jangan terlalu dekat atau terlalu jauh agar makanan terdeteksi dengan baik.</string>
+    <string name="content_desc_4">Pastikan kamera sudah fokus sebelum menekan tombol capture, agar hasil gambar lebih tajam.</string>
+    <string name="content_desc_5">Saat ini, fitur pemindaian masih mendukung 10 jenis makanan, yaitu:</string>
+
+    <string name="list_item_1">🍽️ Nasi Putih</string>
+    <string name="list_item_2">🍽️ Jagung Rebus</string>
+    <string name="list_item_3">🍽️ Ayam Goreng Paha</string>
+    <string name="list_item_4">🍽️ Telur Ayam Rebus</string>
+    <string name="list_item_5">🍽️ Tempe Goreng</string>
+    <string name="list_item_6">🍽️ Tahu Goreng</string>
+    <string name="list_item_7">🍽️ Tumis Kangkung</string>
+    <string name="list_item_8">🍽️ Bening Bayam</string>
+    <string name="list_item_9">🍽️ Buah Pisang</string>
+    <string name="list_item_10">🍽️ Buah Pisang</string>
 </resources>
