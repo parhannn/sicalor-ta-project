@@ -65,8 +65,10 @@ class MealAdapter(
 
             if (position == selectedPosition) {
                 binding.cardItem.background = ContextCompat.getDrawable(context, R.color.colorPrimary)
+                binding.gradientSeparator.background = ContextCompat.getDrawable(context, R.drawable.gradient_separator)
             } else {
                 binding.cardItem.background = ContextCompat.getDrawable(context, R.color.colorPrimarySoft)
+                binding.gradientSeparator.background = ContextCompat.getDrawable(context, R.drawable.gradient_separator_sec)
             }
 
             itemView.setOnClickListener {
