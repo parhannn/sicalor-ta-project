@@ -36,7 +36,6 @@
             app:itemTextAppearanceActiveBoldEnabled="false"
             app:labelVisibilityMode="unlabeled"
             app:menu="@menu/bottom_menu">
-
         </com.google.android.material.bottomnavigation.BottomNavigationView>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -48,16 +47,4 @@
         app:layout_anchor="@id/nav"
         app:srcCompat="@drawable/ic_capture_bold"
         app:tint="@color/colorPrimarySoft" />
-
-<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/logout_button"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginBottom="72dp"-->
-<!--        app:backgroundTint="@color/colorError"-->
-<!--        app:layout_anchor="@id/nav"-->
-<!--        app:layout_anchorGravity="end"-->
-<!--        app:srcCompat="@drawable/ic_logout"-->
-<!--        app:tint="@color/colorOnPrimary" />-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

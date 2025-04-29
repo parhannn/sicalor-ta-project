@@ -5,8 +5,8 @@
     <color name="transparent">#00FFFFFF</color>
 
     <!-- Primary Colors -->
-    <color name="colorPrimarySoft">#DDEB9D</color> <!-- Purple 500 -->
-    <color name="colorPrimary">#A0C878</color> <!-- Purple 500 -->
+    <color name="colorPrimarySoft">#DCE975</color> <!-- Purple 500 -->
+    <color name="colorPrimary">#8DC153</color> <!-- Purple 500 -->
     <color name="colorPrimaryDark">#CC2710</color> <!-- Purple 700 -->
     <color name="colorAccent">#03DAC5</color> <!-- Teal 200 -->
 
@@ -26,7 +26,7 @@
     <color name="colorOnDarkDefault">#1D1D1D</color>
 
     <!-- Error and Warning Colors -->
-    <color name="colorError">#B00020</color> <!-- Red (for errors) -->
+    <color name="colorError">#D01503</color> <!-- Red (for errors) -->
     <color name="colorWarning">#FFA000</color> <!-- Amber 700 (for warnings) -->
 
     <!-- Neutral Colors -->
@@ -45,4 +45,8 @@
     <color name="colorCustom1">#FF5722</color> <!-- Deep Orange 500 -->
     <color name="colorCustom2">#9C27B0</color>
     <color name="dark_gray">#FF333333</color> <!-- Deep Purple 500 -->
+
+    <color name="colorBreakfast">#FFC145</color>
+    <color name="colorLunch">#C84C05</color>
+    <color name="colorDinner">#001A6E</color>
 </resources>

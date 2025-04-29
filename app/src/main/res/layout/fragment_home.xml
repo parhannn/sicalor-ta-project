@@ -151,7 +151,7 @@
                                 android:max="100"
                                 android:progress="0"
                                 android:progressDrawable="@drawable/carbs_progress_bar"
-                                tools:progress="100" />
+                                tools:progress="80" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <TextView
@@ -192,7 +192,7 @@
                                 android:max="100"
                                 android:progress="0"
                                 android:progressDrawable="@drawable/fat_progress_bar"
-                                tools:progress="100" />
+                                tools:progress="30" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <TextView
@@ -233,7 +233,7 @@
                                 android:max="100"
                                 android:progress="0"
                                 android:progressDrawable="@drawable/protein_progress_bar"
-                                tools:progress="100" />
+                                tools:progress="50" />
                         </com.google.android.material.card.MaterialCardView>
 
                         <TextView
@@ -272,7 +272,7 @@
                         android:max="100"
                         android:progress="0"
                         android:progressDrawable="@drawable/progress_bar_custom"
-                        tools:progress="100" />
+                        tools:progress="89" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -494,7 +494,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:listitem="@layout/item_today_plan"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/no_data_found_placeholder"

@@ -52,7 +52,22 @@ class SchedulePlanAdapter(
             binding.foodName.text = meal.name
             binding.foodCalories.text = "${meal.calories} kcal"
             binding.foodPortion.text = "${meal.portion} g"
-            binding.foodType.text = schedulePlan.type
+
+            when (schedulePlan.type) {
+                "Breakfast" -> {
+                    binding.foodType.text = "${schedulePlan.type} 🍳"
+                    binding.foodType.setTextColor(context.resources.getColor(R.color.colorBreakfast))
+                }
+                "Lunch" -> {
+                    binding.foodType.text = "${schedulePlan.type} 🍚"
+                    binding.foodType.setTextColor(context.resources.getColor(R.color.colorLunch))
+                }
+                "Dinner" -> {
+                    binding.foodType.text = "${schedulePlan.type} 🍝"
+                    binding.foodType.setTextColor(context.resources.getColor(R.color.colorDinner))
+                }
+            }
+
             Glide.with(binding.foodImage.context)
                 .load(meal.img)
                 .placeholder(R.drawable.ic_food_1)
