@@ -154,11 +154,24 @@ class HomeFragment : Fragment() {
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData =
-                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date && mealPlanData.type == selectedPlan) {
-                                mealPlanDataList.add(mealPlanData)
-                                mealDataList.add(mealPlanData.mealData)
+                            val value = mealPlanDataSnapshot.value
+
+                            if (value is Map<*, *>) {
+                                try {
+                                    val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                                    if (mealPlanData != null &&
+                                        mealPlanData.userId == userId &&
+                                        mealPlanData.date == date &&
+                                        mealPlanData.type == selectedPlan
+                                    ) {
+                                        mealPlanDataList.add(mealPlanData)
+                                        mealDataList.add(mealPlanData.mealData)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("FirebaseParseError", "Failed to parse MealPlanData: ${e.message}")
+                                }
+                            } else {
+                                Log.w("Firebase", "Skipping invalid mealPlanData (type not Map): $value")
                             }
                         }
                     }
@@ -174,7 +187,6 @@ class HomeFragment : Fragment() {
                         binding.noDataFoundPlaceholder.visibility = View.VISIBLE
                         adapter.updateData(emptyList(), emptyList())
                     }
-
                 } else {
                     Log.d("DEBUG", "No data available")
                 }
@@ -203,30 +215,39 @@ class HomeFragment : Fragment() {
                     var groupFour = 0
                     var groupFive = 0
                     var groupSix = 0
+
                     carbsNeedGrams = (calorieTarget * 0.55)
                     proteinNeedGrams = (calorieTarget * 0.15)
                     fatNeedGrams = (calorieTarget * 0.25)
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData =
-                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
-                                mealPlanDataList.add(mealPlanData)
-                                mealDataList.add(mealPlanData.mealData)
-                                totalCalories += mealPlanData.mealData.calories.toDouble()
-                                totalCarbs += mealPlanData.mealData.carbs.toDouble()
-                                totalFat += mealPlanData.mealData.fat.toDouble()
-                                totalProtein += mealPlanData.mealData.protein.toDouble()
+                            val value = mealPlanDataSnapshot.value
+                            if (value is Map<*, *>) {
+                                try {
+                                    val mealPlanData = mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                                    if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date) {
+                                        mealPlanDataList.add(mealPlanData)
+                                        mealDataList.add(mealPlanData.mealData)
+                                        totalCalories += mealPlanData.mealData.calories.toDouble()
+                                        totalCarbs += mealPlanData.mealData.carbs.toDouble()
+                                        totalFat += mealPlanData.mealData.fat.toDouble()
+                                        totalProtein += mealPlanData.mealData.protein.toDouble()
 
-                                when (mealPlanData.mealData.group) {
-                                    "Golongan 1" -> groupOne++
-                                    "Golongan 2" -> groupTwo++
-                                    "Golongan 3" -> groupThree++
-                                    "Golongan 4" -> groupFour++
-                                    "Golongan 5" -> groupFive++
-                                    "Golongan 6" -> groupSix++
+                                        when (mealPlanData.mealData.group) {
+                                            "Golongan 1" -> groupOne++
+                                            "Golongan 2" -> groupTwo++
+                                            "Golongan 3" -> groupThree++
+                                            "Golongan 4" -> groupFour++
+                                            "Golongan 5" -> groupFive++
+                                            "Golongan 6" -> groupSix++
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("FirebaseParseError", "Failed to parse MealPlanData: ${e.message}")
                                 }
+                            } else {
+                                Log.w("Firebase", "Skipping invalid mealPlanData (type not Map): $value")
                             }
                         }
                     }

@@ -146,11 +146,21 @@ class ScheduleFragment : Fragment(), SchedulePlanAdapter.MealAdapterInterface, M
 
                     for (userSnapshot in snapshot.children) {
                         for (mealPlanDataSnapshot in userSnapshot.children) {
-                            val mealPlanData =
-                                mealPlanDataSnapshot.getValue(MealPlanData::class.java)
-                            if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date && mealPlanData.type == selectedPlan) {
-                                mealPlanDataList.add(mealPlanData)
-                                mealDataList.add(mealPlanData.mealData)
+                            val value = mealPlanDataSnapshot.value
+
+                            if (value is Map<*, *>) {
+                                try {
+                                    val mealPlanData =
+                                        mealPlanDataSnapshot.getValue(MealPlanData::class.java)
+                                    if (mealPlanData != null && mealPlanData.userId == userId && mealPlanData.date == date && mealPlanData.type == selectedPlan) {
+                                        mealPlanDataList.add(mealPlanData)
+                                        mealDataList.add(mealPlanData.mealData)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("FirebaseParseError", "Failed to parse MealPlanData: ${e.message}")
+                                }
+                            } else {
+                                Log.w("Firebase", "Skipping invalid mealPlanData (type not Map): $value")
                             }
                         }
                     }
