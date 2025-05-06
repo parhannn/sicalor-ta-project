@@ -99,17 +99,20 @@ class MealUpdateFragment : DialogFragment() {
             val oldCalories = mealPlanData?.mealData?.calories?.toDoubleOrNull() ?: 0.0
             val newPortion = binding.etPortion.text.toString().toDoubleOrNull() ?: oldPortion
             val newCalories = if (oldPortion != 0.0) (newPortion / oldPortion) * oldCalories else oldCalories
+            val newCarb = if (oldPortion !== 0.0) (newPortion /oldPortion) * mealPlanData?.mealData?.carbs?.toDouble()!! else mealPlanData?.mealData?.carbs?.toDouble()!!
+            val newProtein = if (oldPortion !== 0.0) (newPortion /oldPortion) * mealPlanData?.mealData?.protein?.toDouble()!! else mealPlanData?.mealData?.protein?.toDouble()!!
+            val newFat = if (oldPortion !== 0.0) (newPortion /oldPortion) * mealPlanData?.mealData?.fat?.toDouble()!! else mealPlanData?.mealData?.fat?.toDouble()!!
             val newPlanType = binding.planTypeSpinner.selectedItem.toString()
 
             val updatedMealData = MealData(
                 mealPlanData!!.mealData.img,
                 String.format(Locale.ENGLISH,"%.2f", newCalories),
-                mealPlanData!!.mealData.carbs,
+                String.format(Locale.ENGLISH,"%.2f", newCarb),
                 mealPlanData!!.mealData.desc,
-                mealPlanData!!.mealData.fat,
+                String.format(Locale.ENGLISH,"%.2f", newFat),
                 mealPlanData!!.mealData.group,
                 mealPlanData!!.mealData.name,
-                mealPlanData!!.mealData.protein,
+                String.format(Locale.ENGLISH,"%.2f", newProtein),
                 String.format(Locale.ENGLISH,"%.2f", newPortion)
             )
 
