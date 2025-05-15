@@ -151,7 +151,7 @@ class FormActivity : AppCompatActivity() {
 
     private fun calculateBMR(gender: String, weight: Double, height: Double, age: Int): Double {
         return if (gender == "Male") {
-            66.47 + (13.75 * weight) + (5.003 * height) - (6.75 * age)
+            66.5 + (13.75 * weight) + (5 * height) - (6.75 * age)
         } else {
             655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age)
         }
