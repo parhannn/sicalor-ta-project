@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="activity_level">
-        <item>Very Low (1.2)-no exercise</item>
-        <item>Low (1.35)-light activity</item>
-        <item>Medium (1.5)-light exercise</item>
-        <item>High (1.75)-intense exercise</item>
-        <item>Very High (1.9)-athlete</item>
+        <item>Very Low-Tidak berolahraga, aktifitas harian minimal (banyak duduk).</item>
+        <item>Low-Aktitfitas ringan, berjalan, atau pekerjaan rumah ringan</item>
+        <item>Medium-Olahraga ringan, atau aktifitas fisik sedang beberapa kali seminggu</item>
+        <item>High-Olahrga intens hampir setiap hari, atau pekerjaan fisik berat</item>
+        <item>Very High-Atlet atau pekerjaan fisik yang sangat berat setiap hari</item>
     </string-array>
 </resources>
